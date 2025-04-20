@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const About = () => {
   const handleDonateClick = () => {
@@ -15,21 +16,60 @@ const About = () => {
   return (
     <section id="about" className="py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Centered About CSTS Section */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-blue-950 mb-4">About CSTS</h2>
-          <div className="max-w-4xl mx-auto">
-            <p className="text-gray-600 mb-6 leading-relaxed text-justify">
-              Centre for Studies of Tradition and Systems (CSTS) is an organisation for sustained community engagement with the aim of helping people in resolving the philosophical conflicts by creating a space for dialogue. 
-            </p>
-            <p className="text-gray-600 mb-6 leading-relaxed text-justify">
-              The CSTS should be seen as an institution which is attempting to reclaim the knowledge tradition keeping in mind its contemporariness. 
-            </p>
-            <p className="text-gray-600 mb-6 leading-relaxed text-justify">
-              It should not be taken as a revivalist effort but a creative intervention for resolving the conflict between modernity and tradition to influence the lifeworld of these people.
-            </p>
-          </div>
+        {/* About CSTS with Upcoming Events Side-by-Side */}
+<div className="flex flex-col lg:flex-row gap-12 mb-16">
+  {/* About CSTS Text */}
+  <div className="lg:w-2/3">
+    <h2 className="text-3xl font-bold text-blue-950 mb-4 text-center lg:text-left">About CSTS</h2>
+    <div className="max-w-4xl mx-auto">
+      <p className="text-gray-600 mb-6 leading-relaxed text-justify">
+        Centre for Studies of Tradition and Systems (CSTS) is an organisation for sustained community engagement with the aim of helping people in resolving the philosophical conflicts by creating a space for dialogue. 
+      </p>
+      <p className="text-gray-600 mb-6 leading-relaxed text-justify">
+        The CSTS should be seen as an institution which is attempting to reclaim the knowledge tradition keeping in mind its contemporariness. 
+      </p>
+      <p className="text-gray-600 mb-6 leading-relaxed text-justify">
+        It should not be taken as a revivalist effort but a creative intervention for resolving the conflict between modernity and tradition to influence the lifeworld of these people.
+      </p>
+    </div>
+  </div>
+
+  {/* Upcoming Events Card */}
+  <div className="lg:w-1/3 bg-white border border-gray-200 shadow-lg rounded-xl p-6">
+    <h3 className="text-xl font-semibold text-blue-900 mb-4">📅 Upcoming Events</h3>
+    <ul className="space-y-4 text-gray-700 text-sm">
+      <li>
+        <div className="font-semibold">Maithili Literature Workshop</div>
+        <div className="text-xs text-gray-500 gap-2">May 5, 2025 – Darbhanga
+        <a href="#" className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-5">Coming Soon</a></div>
+      </li>
+      <li>
+        <div className="font-semibold">Water Conservation Drive</div>
+        <div className="text-xs text-gray-500">May 15, 2025 – Madhubani
+          <a href="#" className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-4">Coming Soon</a>
         </div>
+      </li>
+      <li>
+        <div className="font-semibold">Indo-Nepal Heritage Meetup</div>
+        <div className="text-xs text-gray-500">June 1, 2025 – Janakpur
+        <a href="#" className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-7">Coming Soon</a>
+        </div>
+      </li>
+      {/* <li>
+        <div className="font-semibold">Rural Upliftment Hackathon</div>
+        <div className="text-xs text-gray-500">June 20, 2025 – Online
+          <button className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-7">Coming Soon</button>
+        </div>
+      </li> */}
+    </ul>
+    <div className="mt-6">
+      <Link to="/events" className="text-blue-700 hover:underline text-sm font-medium">
+        View All Events →
+      </Link>
+    </div>
+  </div>
+</div>
+
 
         {/* Mission Section */}
         <div className="flex flex-col lg:flex-row items-center gap-12 mb-16">
@@ -82,13 +122,13 @@ const About = () => {
               onClick={handleDonateClick}
               className="bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg active:shadow-sm text-sm sm:text-base w-full sm:w-auto"
             >
-              Donate Now
+              <Link to="/donate">Donate Now</Link>
             </button>
             <button 
               onClick={handleJoinClick}
               className="bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-800 px-6 sm:px-8 py-2 sm:py-3 rounded-md font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg active:shadow-sm text-sm sm:text-base w-full sm:w-auto"
             >
-              Join Us Now
+              <Link to="/join-us">Join Us Now</Link>
             </button>
           </div>
         </div>

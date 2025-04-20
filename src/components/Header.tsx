@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import Logo from './Logo';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMithilaMenuOpen, setIsMithilaMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,11 +42,39 @@ const Header = () => {
                   : (isScrolled 
                       ? 'text-gray-800 hover:text-blue-700' 
                       : 'text-gray-800 hover:text-blue-700')
-              }`}
+                }`}
             >
               Home
             </Link>
-            {['About US', 'Know Mithila', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
+            <div className="relative group">
+              <button
+                className={`flex items-center text-sm font-medium transition-colors duration-300 ${
+                  isOpen 
+                    ? 'text-white hover:text-pink-200' 
+                    : (isScrolled 
+                        ? 'text-gray-800 hover:text-blue-700' 
+                        : 'text-gray-800 hover:text-blue-700')
+                }`}
+                onMouseEnter={() => setIsMithilaMenuOpen(true)}
+                onMouseLeave={() => setIsMithilaMenuOpen(false)}
+              >
+                Know Mithila
+                <ChevronDown className="ml-1 w-4 h-4" />
+              </button>
+              <div 
+                className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transform opacity-0 invisible transition-all duration-300 group-hover:opacity-100 group-hover:visible`}
+              >
+                <div className="py-1">
+                  <Link
+                    to="/know-mithila/festivals"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700"
+                  >
+                    Festivals OF Mithila
+                  </Link>
+                </div>
+              </div>
+            </div>
+            {['About US', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
               <Link 
                 key={item}
                 to={`/${item.toLowerCase().replace(' ', '-')}`}
@@ -94,7 +123,25 @@ const Header = () => {
               >
                 Home
               </Link>
-              {['About US', 'Know Mithila', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
+              <div className="relative group">
+                <button
+                  className="text-gray-800 hover:text-blue-700 text-sm font-medium flex items-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Know Mithila
+                  <ChevronDown className="ml-1 w-4 h-4" />
+                </button>
+                <div className="absolute left-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                  <Link
+                    to="/know-mithila/festivals"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Festivals OF Mithila
+                  </Link>
+                </div>
+              </div>
+              {['About US', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
                 <Link 
                   key={item}
                   to={`/${item.toLowerCase().replace(' ', '-')}`}

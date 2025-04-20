@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 const Carousel = () => {
   const images = [
+    '/carousel1.jpg',
+    '/carousel2.jpg',
     '/carousel3.jpg',
-    '/carousel3.jpg',
-    '/carousel3.jpg',
-    '/carousel3.jpg'
+    '/carousel4.jpg'
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
