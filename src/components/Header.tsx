@@ -8,6 +8,10 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMithilaMenuOpen, setIsMithilaMenuOpen] = useState(false);
 
+  const toggleMithilaMenu = () => {
+    setIsMithilaMenuOpen(!isMithilaMenuOpen);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -26,14 +30,28 @@ const Header = () => {
         background: 'linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%)'
       } : isScrolled ? {
         background: 'linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%)'
-      } : undefined}
+      } : {
+        background: 'transparent'
+      }}
     >
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex items-center justify-between h-16">
           <Logo className={isOpen ? 'text-white' : (isScrolled ? 'text-blue-700' : 'text-blue-700')} />
           
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex justify-center space-x-8">
+          {/* Mobile menu button */}
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden text-gray-800 hover:text-gray-600"
+          >
+            {isOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
+
+          {/* Desktop menu */}
+          <nav className="hidden md:flex items-center space-x-8">
             <Link 
               to="/"
               className={`text-sm font-medium transition-colors duration-300 ${
@@ -42,12 +60,13 @@ const Header = () => {
                   : (isScrolled 
                       ? 'text-gray-800 hover:text-blue-700' 
                       : 'text-gray-800 hover:text-blue-700')
-                }`}
+              }`}
             >
               Home
             </Link>
             <div className="relative group">
               <button
+                onClick={toggleMithilaMenu}
                 className={`flex items-center text-sm font-medium transition-colors duration-300 ${
                   isOpen 
                     ? 'text-white hover:text-pink-200' 
@@ -55,23 +74,21 @@ const Header = () => {
                         ? 'text-gray-800 hover:text-blue-700' 
                         : 'text-gray-800 hover:text-blue-700')
                 }`}
-                onMouseEnter={() => setIsMithilaMenuOpen(true)}
-                onMouseLeave={() => setIsMithilaMenuOpen(false)}
               >
                 Know Mithila
-                <ChevronDown className="ml-1 w-4 h-4" />
+                <ChevronDown className="w-4 h-4 ml-1" />
               </button>
-              <div 
-                className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transform opacity-0 invisible transition-all duration-300 group-hover:opacity-100 group-hover:visible`}
+              <div
+                className={`absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 transition-all duration-300 ${
+                  isMithilaMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                }`}
               >
-                <div className="py-1">
-                  <Link
-                    to="/know-mithila/festivals"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700"
-                  >
-                    Festivals OF Mithila
-                  </Link>
-                </div>
+                <Link
+                  to="/know-mithila/festivals"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700"
+                >
+                  Festivals OF Mithila
+                </Link>
               </div>
             </div>
             {['About US', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
@@ -102,65 +119,99 @@ const Header = () => {
               Contact
             </Link>
           </nav>
-          
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-gray-800" 
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
 
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden mt-4 pb-4 animate-fadeIn">
-            <div className="flex flex-col items-center space-y-4 px-4">
-              <Link 
-                to="/"
-                className="text-gray-800 hover:text-blue-700 text-sm font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </Link>
-              <div className="relative group">
-                <button
-                  className="text-gray-800 hover:text-blue-700 text-sm font-medium flex items-center"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Know Mithila
-                  <ChevronDown className="ml-1 w-4 h-4" />
-                </button>
-                <div className="absolute left-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                  <Link
-                    to="/know-mithila/festivals"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700"
-                    onClick={() => setIsOpen(false)}
+          {/* Mobile menu */}
+          <div
+            className={`fixed inset-0 bg-black bg-opacity-50 z-40 ${isOpen ? 'block' : 'hidden'}`}
+            onClick={(e) => {
+              // Only close if clicking outside the menu
+              if (e.target === e.currentTarget) {
+                setIsOpen(false);
+              }
+            }}
+          >
+            <div className="fixed inset-0 bg-white z-50">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-8">
+                  <Logo className={isOpen ? 'text-white' : (isScrolled ? 'text-blue-700' : 'text-blue-700')} />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsOpen(false);
+                    }}
+                    className="text-gray-800 hover:text-gray-600"
                   >
-                    Festivals OF Mithila
-                  </Link>
+                    <X className="w-6 h-6" />
+                  </button>
                 </div>
+                <nav className="space-y-4">
+                  <Link 
+                    to="/" 
+                    className="block text-gray-800 hover:text-gray-600 font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsOpen(false);
+                    }}
+                  >
+                    Home
+                  </Link>
+                  <div className="relative group">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleMithilaMenu();
+                      }}
+                      className="flex items-center justify-between w-full text-gray-800 hover:text-gray-600 font-medium"
+                    >
+                      Know Mithila
+                      <ChevronDown className="w-4 h-4 ml-2" />
+                    </button>
+                    <div
+                      className={`absolute left-0 w-full bg-white rounded-md shadow-lg z-50 transition-all duration-300 ${
+                        isMithilaMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                      }`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Link 
+                        to="/know-mithila/festivals" 
+                        className="block px-4 py-2 hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsOpen(false);
+                        }}
+                      >
+                        Festivals OF Mithila
+                      </Link>
+                    </div>
+                  </div>
+                  {['About US', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
+                    <Link 
+                      key={item}
+                      to={`/${item.toLowerCase().replace(' ', '-')}`}
+                      className="block text-gray-800 hover:text-gray-600 font-medium"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOpen(false);
+                      }}
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                  <Link 
+                    to="/contact" 
+                    className="block text-gray-800 hover:text-gray-600 font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsOpen(false);
+                    }}
+                  >
+                    Contact
+                  </Link>
+                </nav>
               </div>
-              {['About US', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
-                <Link 
-                  key={item}
-                  to={`/${item.toLowerCase().replace(' ', '-')}`}
-                  className="text-gray-800 hover:text-blue-700 text-sm font-medium"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item}
-                </Link>
-              ))}
-              <Link 
-                to="/contact"
-                className="text-gray-800 hover:text-blue-700 text-sm font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                Contact
-              </Link>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );
