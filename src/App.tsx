@@ -14,6 +14,7 @@ import Join from './components/Join';
 import Donate from './components/Donate';
 import Membership from './components/Membership';
 import SakshamMithila from './components/SakshamMithila';
+import FestivalMithila from './components/FestivalMithila';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="/donate" element={<Donate />} />
             <Route path="/membership" element={<Membership />} />
             <Route path="/saksham-mithila" element={<SakshamMithila />} />
+            <Route path="/know-mithila/festivals" element={<FestivalMithila />} />
           </Routes>
         </main>
       </div>
