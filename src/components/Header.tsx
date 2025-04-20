@@ -167,17 +167,18 @@ const Header = () => {
                       <ChevronDown className="w-4 h-4 ml-2" />
                     </button>
                     <div
-                      className={`absolute left-0 w-full bg-white rounded-md shadow-lg z-50 transition-all duration-300 ${
-                        isMithilaMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                      className={`mt-2 p-2 bg-white rounded-md shadow-lg transition-all duration-300 ${
+                        isMithilaMenuOpen ? 'block' : 'hidden'
                       }`}
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Link 
                         to="/know-mithila/festivals" 
-                        className="block px-4 py-2 hover:bg-gray-100"
+                        className="block px-4 py-2 hover:bg-gray-100 text-gray-800 hover:text-gray-600"
                         onClick={(e) => {
                           e.stopPropagation();
                           setIsOpen(false);
+                          setIsMithilaMenuOpen(false);
                         }}
                       >
                         Festivals OF Mithila
