@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import Footer from './Footer';
 
 const jobData = [
   {
@@ -26,6 +27,7 @@ const jobData = [
 
 const Career = () => {
   return (
+    <>
     <section className="min-h-screen px-4 md:px-20 py-10 bg-gradient-to-b from-white to-blue-50 mt-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -89,6 +91,8 @@ const Career = () => {
         </motion.button>
       </motion.div>
     </section>
+    <Footer />
+    </>
   );
 };
 

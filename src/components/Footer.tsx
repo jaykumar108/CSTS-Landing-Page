@@ -1,79 +1,172 @@
 import React from "react";
-import { Mail, MapPin, SendHorizonal, Twitter, Facebook, Instagram, Linkedin } from "lucide-react";
+import { motion } from "framer-motion";
+import { Mail, MapPin, SendHorizontal, Twitter, Facebook, Instagram, Linkedin } from "lucide-react";
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.2,
+      duration: 0.6,
+      ease: 'easeOut'
+    }
+  })
+};
+
+const slideIn = {
+  hidden: { x: -50, opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.6,
+      ease: 'easeOut'
+    }
+  }
+};
 
 const Footer = () => {
   return (
     <footer className="bg-[#0a1d3b] text-white py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeInUp}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={slideIn}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12"
+        >
           {/* About Section */}
-          <div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={slideIn}
+          >
             <h3 className="text-lg font-semibold mb-4">ABOUT CSTS</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:underline">Home</a></li>
-              <li><a href="#" className="hover:underline">About Us</a></li>
-              <li><a href="#" className="hover:underline">Events</a></li>
-              <li><a href="#" className="hover:underline">Blog</a></li>
-              <li><a href="#" className="hover:underline">Contact Us</a></li>
+              {['Home', 'About Us', 'Events', 'Blog', 'Contact Us'].map((item, index) => (
+                <motion.li
+                  key={item}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={slideIn}
+                  custom={index}
+                >
+                  <a href="#" className="hover:underline">{item}</a>
+                </motion.li>
+              ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Involvement */}
-          <div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={slideIn}
+          >
             <h3 className="text-lg font-semibold mb-4">GET INVOLVED</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:underline">Donation</a></li>
-              <li><a href="#" className="hover:underline">Membership</a></li>
-              <li><a href="#" className="hover:underline">Volunteer</a></li>
-              <li><a href="#" className="hover:underline">Saksham Mithila</a></li>
+              {['Donation', 'Membership', 'Volunteer', 'Saksham Mithila'].map((item, index) => (
+                <motion.li
+                  key={item}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={slideIn}
+                  custom={index}
+                >
+                  <a href="#" className="hover:underline">{item}</a>
+                </motion.li>
+              ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Contact */}
-          <div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={slideIn}
+          >
             <h3 className="text-lg font-semibold mb-4">CONNECT WITH US</h3>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                <span>csts.ind@gmail.com</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                <span>maithilimachaan@gmail.com</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                <span>madhubanilitfest@gmail.com</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 mt-1" />
-                <span>SH75 Mabbi Road, Darbhanga, Bihar 846005</span>
-              </li>
+              {[
+                { icon: Mail, text: 'csts.ind@gmail.com' },
+                { icon: Mail, text: 'maithilimachaan@gmail.com' },
+                { icon: Mail, text: 'madhubanilitfest@gmail.com' },
+                { icon: MapPin, text: 'SH75 Mabbi Road, Darbhanga, Bihar 846005' }
+              ].map((item, index) => (
+                <motion.li
+                  key={index}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={slideIn}
+                  custom={index}
+                  className="flex items-center gap-2"
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.text}</span>
+                </motion.li>
+              ))}
             </ul>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Social Media Icons */}
-        <div className="mt-6 flex justify-center gap-6 flex-wrap">
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-            <Twitter className="w-6 h-6 text-white hover:text-[#1da1f2]" />
-          </a>
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-            <Facebook className="w-6 h-6 text-white hover:text-[#3b5998]" />
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-            <Instagram className="w-6 h-6 text-white hover:text-[#e1306c]" />
-          </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-            <Linkedin className="w-6 h-6 text-white hover:text-[#0077b5]" />
-          </a>
-        </div>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          className="mt-6 flex justify-center gap-6 flex-wrap"
+        >
+          {[
+            { icon: Twitter, href: "https://twitter.com", color: "#1da1f2" },
+            { icon: Facebook, href: "https://facebook.com", color: "#3b5998" },
+            { icon: Instagram, href: "https://instagram.com", color: "#e1306c" },
+            { icon: Linkedin, href: "https://linkedin.com", color: "#0077b5" }
+          ].map((social, index) => (
+            <motion.a
+              key={index}
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={slideIn}
+              custom={index}
+              className="transition-colors duration-300"
+              whileHover={{ scale: 1.1 }}
+            >
+              <social.icon className="w-6 h-6 text-white" />
+            </motion.a>
+          ))}
+        </motion.div>
 
         {/* Bottom Bar */}
-        <div className="mt-10 border-t border-white/20 pt-6 text-center text-sm">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          className="mt-10 border-t border-white/20 pt-6 text-center text-sm"
+        >
           &copy; 2022 CSTS | All rights reserved.
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </footer>
   );
 };
