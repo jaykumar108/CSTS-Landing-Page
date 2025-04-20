@@ -164,7 +164,7 @@ const Footer = () => {
           variants={fadeInUp}
           className="mt-10 border-t border-white/20 pt-6 text-center text-sm"
         >
-          &copy; 2022 CSTS | All rights reserved.
+          &copy; 2022 CSTS ( Centre for Studies of Tradition and Systems) | All rights reserved.
         </motion.div>
       </motion.div>
     </footer>
