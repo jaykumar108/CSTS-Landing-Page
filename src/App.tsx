@@ -17,6 +17,7 @@ import FestivalMithila from './components/FestivalMithila';
 import Gallery from './components/Gallery';
 import AboutCSTS from './components/AboutCSTS';
 import GyanChangera from './components/GyanChangera';
+import KnowMithila from './components/KnowMithila';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/about-us" element={<AboutCSTS />} />
             <Route path="/gyan-changera" element={<GyanChangera />} />
+            <Route path="/know-mithila" element={<KnowMithila />} />
           </Routes>
         </main>
       </div>

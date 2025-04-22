@@ -136,7 +136,7 @@ const testimonials = [
 ];
 
 // Star rating component
-const StarRating = ({ rating }) => {
+const StarRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex">
       {[...Array(5)].map((_, i) => (
@@ -164,7 +164,7 @@ const GyanChangera = () => {
         {/* Hero Section */}
         <section className="relative pt-32 pb-20 overflow-hidden">
           <div className="absolute inset-0 bg-cover bg-center opacity-5 z-0" 
-               style={{ backgroundImage: "url('')" }} />
+               style={{ backgroundImage: "url('/carousel1.jpg')" }} />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-4xl mx-auto text-center">

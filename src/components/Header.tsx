@@ -87,11 +87,19 @@ const Header = () => {
                 }`}
               >
                 <Link
+                  to="/know-mithila"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700"
+                >
+                   About Mithila
+                </Link>
+                <Link
                   to="/know-mithila/festivals"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700"
                 >
                   Festivals OF Mithila
                 </Link>
+                
+
               </div>
             </div>
             {['About US', 'MLF','Maithil Machaan','Gallery','Saksham Mithila','Gyan Changera','Career','Join Us'].map((item) => (
@@ -176,6 +184,17 @@ const Header = () => {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Link 
+                        to="/know-mithila" 
+                        className="block px-4 py-2 hover:bg-gray-100 text-gray-800 hover:text-gray-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsOpen(false);
+                          setIsMithilaMenuOpen(false);
+                        }}
+                      >
+                        About Mithila
+                      </Link>
+                      <Link 
                         to="/know-mithila/festivals" 
                         className="block px-4 py-2 hover:bg-gray-100 text-gray-800 hover:text-gray-600"
                         onClick={(e) => {
@@ -184,7 +203,7 @@ const Header = () => {
                           setIsMithilaMenuOpen(false);
                         }}
                       >
-                        Festivals OF Mithila
+                        Festivals OF Mithila 
                       </Link>
                     </div>
                   </div>
