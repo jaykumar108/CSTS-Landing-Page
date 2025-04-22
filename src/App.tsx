@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Events from './components/Events';
@@ -15,6 +14,9 @@ import Donate from './components/Donate';
 import Membership from './components/Membership';
 import SakshamMithila from './components/SakshamMithila';
 import FestivalMithila from './components/FestivalMithila';
+import Gallery from './components/Gallery';
+import AboutCSTS from './components/AboutCSTS';
+import GyanChangera from './components/GyanChangera';
 
 function App() {
   return (
@@ -40,6 +42,9 @@ function App() {
             <Route path="/membership" element={<Membership />} />
             <Route path="/saksham-mithila" element={<SakshamMithila />} />
             <Route path="/know-mithila/festivals" element={<FestivalMithila />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/about-us" element={<AboutCSTS />} />
+            <Route path="/gyan-changera" element={<GyanChangera />} />
           </Routes>
         </main>
       </div>

@@ -66,7 +66,8 @@ const Header = () => {
             </Link>
             <div className="relative group">
               <button
-                onClick={toggleMithilaMenu}
+                onMouseEnter={() => setIsMithilaMenuOpen(true)}
+                onMouseLeave={() => setIsMithilaMenuOpen(false)}
                 className={`flex items-center text-sm font-medium transition-colors duration-300 ${
                   isOpen 
                     ? 'text-white hover:text-pink-200' 
@@ -79,6 +80,8 @@ const Header = () => {
                 <ChevronDown className="w-4 h-4 ml-1" />
               </button>
               <div
+                onMouseEnter={() => setIsMithilaMenuOpen(true)}
+                onMouseLeave={() => setIsMithilaMenuOpen(false)}
                 className={`absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 transition-all duration-300 ${
                   isMithilaMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
                 }`}
