@@ -19,6 +19,7 @@ import AboutCSTS from './components/AboutCSTS';
 import GyanChangera from './components/GyanChangera';
 import KnowMithila from './components/KnowMithila';
 import MaithiliMachaan from './components/MaithiliMachaan';
+import MLF from './components/MLF';
 function App() {
   return (
     <Router>
@@ -48,6 +49,8 @@ function App() {
             <Route path="/gyan-changera" element={<GyanChangera />} />
             <Route path="/know-mithila" element={<KnowMithila />} />
             <Route path="/maithil-machaan" element={<MaithiliMachaan />} />
+            <Route path="/mlf" element={<MLF/>}/>
+            
           </Routes>
         </main>
       </div>
