@@ -18,7 +18,7 @@ import Gallery from './components/Gallery';
 import AboutCSTS from './components/AboutCSTS';
 import GyanChangera from './components/GyanChangera';
 import KnowMithila from './components/KnowMithila';
-
+import MaithiliMachaan from './components/MaithiliMachaan';
 function App() {
   return (
     <Router>
@@ -47,6 +47,7 @@ function App() {
             <Route path="/about-us" element={<AboutCSTS />} />
             <Route path="/gyan-changera" element={<GyanChangera />} />
             <Route path="/know-mithila" element={<KnowMithila />} />
+            <Route path="/maithil-machaan" element={<MaithiliMachaan />} />
           </Routes>
         </main>
       </div>

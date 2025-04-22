@@ -137,9 +137,9 @@ const Career = () => {
               Explore exciting career opportunities and make a meaningful impact.
             </motion.p>
             
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-col sm:flex-row justify-center gap-4"
             >
@@ -161,8 +161,8 @@ const Career = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center mb-12"
-          >
+        className="text-center mb-12"
+      >
             <motion.h2 
               variants={fadeInUp}
               className="text-3xl font-bold text-gray-900 mb-4"
@@ -176,8 +176,8 @@ const Career = () => {
             >
               What makes working with CSTS a unique and rewarding experience
             </motion.p>
-          </motion.div>
-          
+      </motion.div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {companyValues.map((value, index) => (
               <motion.div
@@ -309,7 +309,7 @@ const Career = () => {
                   custom={index}
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
                   className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all p-6 flex flex-col"
-                >
+          >
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-2 ${
@@ -378,10 +378,10 @@ const Career = () => {
                       ))}
                     </div>
                   )}
-                  
+            
                   <div className="mt-auto">
                     <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors">
-                      Apply Now
+              Apply Now
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -457,30 +457,30 @@ const Career = () => {
                   Create impactful content for our digital platforms, helping to promote awareness of cultural heritage.
                 </p>
               </motion.div>
-            </div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+        transition={{ duration: 0.6 }}
               className="bg-white/10 backdrop-blur-sm p-8 rounded-xl"
-            >
+      >
               <h3 className="text-2xl font-semibold mb-4">Why Volunteer With Us?</h3>
               <p className="text-blue-100 mb-4">
                 Volunteering with CSTS gives you the opportunity to make a real difference in preserving linguistic and cultural heritage. You'll work with experts in the field, gain valuable experience, and contribute to meaningful projects.
-              </p>
+        </p>
               <p className="text-blue-100 mb-6">
                 Exceptional volunteers who demonstrate outstanding dedication and impact will receive a personalized recommendation letter recognizing their contributions.
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+        </p>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
                 className="px-8 py-3 bg-white text-blue-800 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-              >
+        >
                 Apply to Volunteer
-              </motion.button>
-            </motion.div>
+        </motion.button>
+      </motion.div>
           </div>
         </div>
       </section>
@@ -602,9 +602,9 @@ const Career = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+    </section>
       
-      <Footer />
+    <Footer />
     </>
   );
 };
