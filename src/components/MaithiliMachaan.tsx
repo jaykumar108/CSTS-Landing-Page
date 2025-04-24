@@ -94,7 +94,7 @@ const MaithiliMachaan = () => {
 
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-white overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-white">
       {/* Decorative Elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-red-100 rounded-full opacity-30 -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute top-1/4 left-0 w-40 h-40 bg-yellow-200 rounded-full opacity-20 -translate-x-1/2"></div>
@@ -103,7 +103,7 @@ const MaithiliMachaan = () => {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/pattern.png')] bg-repeat opacity-5 z-0"></div>
         
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -159,7 +159,7 @@ const MaithiliMachaan = () => {
       <section id="about" className="py-16 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[40%] h-[80%] bg-yellow-50 rounded-l-full opacity-50 z-0"></div>
         
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -214,7 +214,7 @@ const MaithiliMachaan = () => {
 
       {/* Key Aspects Section */}
       <section className="py-16 bg-gradient-to-br from-white to-yellow-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -299,7 +299,7 @@ const MaithiliMachaan = () => {
 
       {/* Upcoming Events */}
       <section id="events" className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -364,9 +364,10 @@ const MaithiliMachaan = () => {
         </div>
       </section>
 
+     
       {/* Gallery */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -401,7 +402,7 @@ const MaithiliMachaan = () => {
                 variants={fadeInUp}
                 custom={index}
                 whileHover={{ scale: 1.03 }}
-                className="relative overflow-hidden rounded-lg shadow-md aspect-square w-full"
+                className="relative overflow-hidden rounded-lg shadow-md aspect-square"
               >
                 <img 
                   src={image.src} 
@@ -409,7 +410,7 @@ const MaithiliMachaan = () => {
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <Camera className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  <Camera className="w-10 h-10 text-white" />
                 </div>
               </motion.div>
             ))}
@@ -419,7 +420,7 @@ const MaithiliMachaan = () => {
 
       {/* Testimonials */}
       <section className="py-16 bg-gradient-to-br from-white to-yellow-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -441,7 +442,7 @@ const MaithiliMachaan = () => {
             </motion.p>
           </motion.div>
 
-          <div className="max-w-2xl md:max-w-4xl mx-auto relative">
+          <div className="max-w-4xl mx-auto relative">
             <div className="overflow-hidden">
               <motion.div
                 key={activeTestimonial}
@@ -449,10 +450,10 @@ const MaithiliMachaan = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white p-6 md:p-8 rounded-2xl shadow-lg"
+                className="bg-white p-8 rounded-2xl shadow-lg"
               >
                 <div className="flex flex-col md:flex-row gap-6 items-center">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
                     <img 
                       src={testimonials[activeTestimonial].image} 
                       alt={testimonials[activeTestimonial].author}
@@ -460,10 +461,10 @@ const MaithiliMachaan = () => {
                     />
                   </div>
                   <div>
-                    <svg className="w-8 h-8 md:w-10 md:h-10 text-red-200 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-10 h-10 text-red-200 mb-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                     </svg>
-                    <p className="text-gray-700 mb-6 text-sm md:text-lg italic leading-relaxed">"{testimonials[activeTestimonial].quote}"</p>
+                    <p className="text-gray-700 mb-6 text-lg italic leading-relaxed">"{testimonials[activeTestimonial].quote}"</p>
                     <h4 className="font-bold text-gray-900">{testimonials[activeTestimonial].author}</h4>
                     <p className="text-red-800">{testimonials[activeTestimonial].position}</p>
                   </div>
@@ -489,7 +490,7 @@ const MaithiliMachaan = () => {
 
       {/* Significance Section */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
             whileInView="visible"
