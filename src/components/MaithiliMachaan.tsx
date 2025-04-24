@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Users, Paintbrush, Music, Calendar, ArrowRight, MessageCircle, Globe, ChevronRight, Camera, MapPin } from 'lucide-react';
 import Footer from './Footer';
+import Header from './Header';
 
 // Animation variants
 const fadeInUp = {
@@ -92,7 +93,8 @@ const MaithiliMachaan = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-white">
+    <>
+    <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-white overflow-x-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-red-100 rounded-full opacity-30 -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute top-1/4 left-0 w-40 h-40 bg-yellow-200 rounded-full opacity-20 -translate-x-1/2"></div>
@@ -101,7 +103,7 @@ const MaithiliMachaan = () => {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/pattern.png')] bg-repeat opacity-5 z-0"></div>
         
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -157,7 +159,7 @@ const MaithiliMachaan = () => {
       <section id="about" className="py-16 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[40%] h-[80%] bg-yellow-50 rounded-l-full opacity-50 z-0"></div>
         
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -212,7 +214,7 @@ const MaithiliMachaan = () => {
 
       {/* Key Aspects Section */}
       <section className="py-16 bg-gradient-to-br from-white to-yellow-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -297,7 +299,7 @@ const MaithiliMachaan = () => {
 
       {/* Upcoming Events */}
       <section id="events" className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -362,63 +364,9 @@ const MaithiliMachaan = () => {
         </div>
       </section>
 
-      {/* Connection with Madhubani Literature Festival */}
-      <section className="py-16 bg-gradient-to-br from-red-800 to-red-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <motion.h2 
-                variants={fadeInUp}
-                className="text-3xl font-bold mb-4"
-              >
-                Connection with Madhubani Literature Festival
-              </motion.h2>
-              <motion.p 
-                variants={fadeInUp}
-                custom={1}
-                className="text-lg text-red-100 leading-relaxed"
-              >
-                As a part of the Madhubani Literature Festival, Maithili Machaan serves as a cultural think tank, bringing together scholars, writers, artists, and intellectuals. It provides a space for debates, literary readings, and discussions on Maithili identity and progress.
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-white/10 backdrop-blur-sm p-8 rounded-xl"
-            >
-              <div className="flex items-center justify-center mb-6">
-                <Globe className="w-12 h-12 text-yellow-400" />
-              </div>
-              <h3 className="text-2xl font-semibold text-center mb-6">Join the Conversation</h3>
-              <p className="text-center text-red-100 mb-8">
-                Be part of this vibrant cultural discourse that's shaping the future of Maithili language and literature. Together, we can ensure the preservation and celebration of Mithila's rich heritage.
-              </p>
-              <div className="flex justify-center">
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="/madhubani-literature-festival"
-                  className="px-6 py-3 bg-white text-red-900 rounded-lg font-medium hover:bg-red-50 transition-colors"
-                >
-                  Explore Madhubani Literature Festival
-                </motion.a>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
       {/* Gallery */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -453,7 +401,7 @@ const MaithiliMachaan = () => {
                 variants={fadeInUp}
                 custom={index}
                 whileHover={{ scale: 1.03 }}
-                className="relative overflow-hidden rounded-lg shadow-md aspect-square"
+                className="relative overflow-hidden rounded-lg shadow-md aspect-square w-full"
               >
                 <img 
                   src={image.src} 
@@ -461,7 +409,7 @@ const MaithiliMachaan = () => {
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <Camera className="w-10 h-10 text-white" />
+                  <Camera className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                 </div>
               </motion.div>
             ))}
@@ -471,7 +419,7 @@ const MaithiliMachaan = () => {
 
       {/* Testimonials */}
       <section className="py-16 bg-gradient-to-br from-white to-yellow-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -493,7 +441,7 @@ const MaithiliMachaan = () => {
             </motion.p>
           </motion.div>
 
-          <div className="max-w-4xl mx-auto relative">
+          <div className="max-w-2xl md:max-w-4xl mx-auto relative">
             <div className="overflow-hidden">
               <motion.div
                 key={activeTestimonial}
@@ -501,10 +449,10 @@ const MaithiliMachaan = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white p-8 rounded-2xl shadow-lg"
+                className="bg-white p-6 md:p-8 rounded-2xl shadow-lg"
               >
                 <div className="flex flex-col md:flex-row gap-6 items-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0">
                     <img 
                       src={testimonials[activeTestimonial].image} 
                       alt={testimonials[activeTestimonial].author}
@@ -512,10 +460,10 @@ const MaithiliMachaan = () => {
                     />
                   </div>
                   <div>
-                    <svg className="w-10 h-10 text-red-200 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 md:w-10 md:h-10 text-red-200 mb-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                     </svg>
-                    <p className="text-gray-700 mb-6 text-lg italic leading-relaxed">"{testimonials[activeTestimonial].quote}"</p>
+                    <p className="text-gray-700 mb-6 text-sm md:text-lg italic leading-relaxed">"{testimonials[activeTestimonial].quote}"</p>
                     <h4 className="font-bold text-gray-900">{testimonials[activeTestimonial].author}</h4>
                     <p className="text-red-800">{testimonials[activeTestimonial].position}</p>
                   </div>
@@ -541,7 +489,7 @@ const MaithiliMachaan = () => {
 
       {/* Significance Section */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -590,35 +538,11 @@ const MaithiliMachaan = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-red-800 to-red-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <h2 className="text-3xl font-bold mb-6">Join the Maithili Machaan Community</h2>
-            <p className="text-red-100 mb-8">
-              Be part of our mission to preserve, promote, and celebrate the rich cultural heritage of Mithila. 
-              Stay updated with our events, discussions, and initiatives.
-            </p>
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="/contact"
-              className="px-8 py-3 bg-white text-red-900 rounded-lg font-semibold hover:bg-red-50 transition-colors inline-block"
-            >
-              Get Involved
-            </motion.a>
-          </motion.div>
-        </div>
-      </section>
-
-      <Footer />
+      
+     
     </div>
+    <Footer />
+    </>
   );
 };
 
