@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.font-sans {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-serif {
+  font-family: 'Merriweather', serif;
+}
