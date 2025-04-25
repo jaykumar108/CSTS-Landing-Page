@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import Layout from '../components/Layout';
 import useAuth from '../hooks/useAuth';
@@ -6,7 +6,8 @@ import useAuth from '../hooks/useAuth';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, token, refreshUser } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     username: user?.username || '',
@@ -17,6 +18,7 @@ const Profile: React.FC = () => {
   });
   
   const [loading, setLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +57,17 @@ const Profile: React.FC = () => {
         })
       };
       
-      await axios.put(`${API_URL}/auth/update-profile`, updateData);
+      // Add authentication token to request headers
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      };
+      
+      console.log('Sending update request with token:', token);
+      const response = await axios.put(`${API_URL}/auth/update-profile`, updateData, config);
+      console.log('Profile update response:', response.data);
       
       setMessage({ type: 'success', text: 'Profile updated successfully' });
       setFormData({
@@ -65,12 +77,69 @@ const Profile: React.FC = () => {
         confirmPassword: ''
       });
     } catch (err: any) {
+      console.error('Profile update error:', err.response?.data || err.message);
       setMessage({ 
         type: 'error', 
         text: err.response?.data?.message || 'Failed to update profile' 
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageClick = () => {
+    // Trigger file input click when image is clicked
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      setMessage({ type: 'error', text: 'Only image files are allowed (jpg, jpeg, png, gif)' });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'Image size must be less than 5MB' });
+      return;
+    }
+
+    try {
+      setUploadLoading(true);
+      setMessage(null);
+
+      const formData = new FormData();
+      formData.append('profileImage', file);
+
+      // Add authentication token to request headers
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      };
+
+      const response = await axios.put(`${API_URL}/auth/admin/update-profile-image`, formData, config);
+      
+      // Update user context to reflect new profile image
+      if (refreshUser) {
+        refreshUser();
+      }
+      
+      setMessage({ type: 'success', text: 'Profile image updated successfully' });
+    } catch (err: any) {
+      console.error('Profile image upload error:', err.response?.data || err.message);
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to upload profile image'
+      });
+    } finally {
+      setUploadLoading(false);
     }
   };
   
@@ -80,12 +149,43 @@ const Profile: React.FC = () => {
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <div className="px-6 py-8">
             <div className="text-center mb-8">
-              <div className="w-24 h-24 mx-auto bg-slate-700 rounded-full flex items-center justify-center mb-4">
-                <span className="text-3xl text-white font-bold">
-                  {user?.username.charAt(0).toUpperCase()}
-                </span>
+              <div 
+                onClick={handleImageClick}
+                className="relative w-32 h-32 mx-auto rounded-full overflow-hidden cursor-pointer group"
+              >
+                {user?.profileImage ? (
+                  <img 
+                    src={user.profileImage} 
+                    alt={user.username} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-700 flex items-center justify-center">
+                    <span className="text-3xl text-white font-bold">
+                      {user?.username.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Overlay with upload icon */}
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-white text-sm">
+                    {uploadLoading ? 'Uploading...' : 'Change Photo'}
+                  </span>
+                </div>
+                
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/jpeg,image/png,image/gif"
+                  onChange={handleImageUpload}
+                  disabled={uploadLoading}
+                />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">{user?.username}</h2>
+              
+              <h2 className="text-2xl font-bold text-gray-800 mt-4">{user?.username}</h2>
               <p className="text-gray-600">{user?.email}</p>
               <p className="mt-2 inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 {user?.role}

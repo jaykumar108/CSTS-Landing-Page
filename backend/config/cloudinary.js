@@ -1,7 +1,7 @@
-const cloudinary = require('cloudinary').v2;
-const dotenv = require('dotenv');
+require('dotenv').config();
 
-dotenv.config();
+// Now you can access the variables using process.env
+const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
 cloudinary.config({

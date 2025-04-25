@@ -1,5 +1,6 @@
 import React from 'react';
 import useAuth from '../hooks/useAuth';
+import NotificationBell from './NotificationBell';
 
 interface HeaderProps {
   title: string;
@@ -13,6 +14,10 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
       
       <div className="flex items-center">
+        <div className="mr-4">
+          <NotificationBell />
+        </div>
+        
         <div className="hidden md:flex mr-4">
           <span className="text-sm text-gray-600 mr-2">Welcome,</span>
           <span className="text-sm font-medium">{user?.username}</span>

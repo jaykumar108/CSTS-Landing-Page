@@ -22,24 +22,49 @@ const JobList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Fetch jobs
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_URL}/jobs`);
-        setJobs(response.data.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching jobs:', err);
-        setError('Failed to load jobs');
-        setLoading(false);
-      }
-    };
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/jobs`);
+      setJobs(response.data.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching jobs:', err);
+      setError('Failed to load jobs');
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchJobs();
   }, []);
+
+  // Handle toggle status
+  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      setStatusUpdating(id);
+      const newStatus = !currentStatus;
+      
+      await axios.put(`${API_URL}/jobs/${id}`, { 
+        isActive: newStatus 
+      });
+      
+      // Update local state
+      setJobs(jobs.map(job => 
+        job._id === id ? { ...job, isActive: newStatus } : job
+      ));
+      
+      setStatusUpdating(null);
+    } catch (err) {
+      console.error('Error updating job status:', err);
+      setError('Failed to update job status');
+      setStatusUpdating(null);
+    }
+  };
 
   // Handle delete
   const handleDelete = async (id: string) => {
@@ -68,21 +93,50 @@ const JobList: React.FC = () => {
     return new Date(expiresAt) < new Date();
   };
 
+  // Filter jobs based on search query
+  const filteredJobs = jobs.filter(job => 
+    searchQuery === '' || 
+    job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    job.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Handle search
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <Layout title="Job Management">
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-700">Job Listings</h2>
-        <Link 
-          to="/admin/jobs/add" 
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Add New Job
-        </Link>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search jobs..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Link 
+            to="/admin/jobs/add" 
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Add New Job
+          </Link>
+        </div>
       </div>
 
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
+          <button 
+            onClick={() => setError(null)} 
+            className="float-right text-red-700 font-bold"
+          >
+            &times;
+          </button>
         </div>
       )}
 
@@ -90,7 +144,7 @@ const JobList: React.FC = () => {
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      ) : jobs.length === 0 ? (
+      ) : filteredJobs.length === 0 ? (
         <div className="bg-gray-50 p-6 rounded-lg text-center">
           <p className="text-gray-600">No job listings found</p>
           <Link 
@@ -106,6 +160,7 @@ const JobList: React.FC = () => {
             <table className="min-w-full">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S.No</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Title</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
@@ -116,8 +171,11 @@ const JobList: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {jobs.map((job) => (
+                {filteredJobs.map((job, index) => (
                   <tr key={job._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{filteredJobs.length - index}</div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{job.title}</div>
                     </td>
@@ -133,20 +191,39 @@ const JobList: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        !job.isActive 
-                          ? 'bg-gray-100 text-gray-800' 
-                          : isExpired(job.expiresAt)
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-green-100 text-green-800'
-                      }`}>
-                        {!job.isActive 
-                          ? 'Inactive' 
-                          : isExpired(job.expiresAt)
-                            ? 'Expired'
-                            : 'Active'
-                        }
-                      </span>
+                      <div className="flex items-center">
+                        {/* Status Toggle Switch */}
+                        <button 
+                          className={`relative inline-block w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2 ${
+                            job.isActive ? 'bg-blue-600' : 'bg-gray-300'
+                          }`}
+                          onClick={() => handleToggleStatus(job._id, job.isActive)}
+                          disabled={statusUpdating === job._id || isExpired(job.expiresAt)}
+                          title={isExpired(job.expiresAt) ? "Can't toggle expired job" : ''}
+                        >
+                          <span 
+                            className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 transform ${
+                              job.isActive ? 'translate-x-6' : 'translate-x-0'
+                            } ${statusUpdating === job._id ? 'animate-pulse' : ''}`}
+                          />
+                        </button>
+                        
+                        {/* Status Text */}
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          !job.isActive 
+                            ? 'bg-gray-100 text-gray-800' 
+                            : isExpired(job.expiresAt)
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-green-100 text-green-800'
+                        }`}>
+                          {!job.isActive 
+                            ? 'Inactive' 
+                            : isExpired(job.expiresAt)
+                              ? 'Expired'
+                              : 'Active'
+                          }
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(job.expiresAt)}

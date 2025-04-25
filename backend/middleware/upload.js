@@ -1,14 +1,8 @@
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('../config/cloudinary');
 const path = require('path');
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const asyncHandler = require('express-async-handler');
 
 // Create storage engine for Cloudinary
 const storage = new CloudinaryStorage({
@@ -40,4 +34,4 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-module.exports = upload; 
+module.exports = upload;

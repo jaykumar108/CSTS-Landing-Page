@@ -159,4 +159,25 @@ exports.deleteGallery = async (req, res) => {
       message: error.message
     });
   }
+};
+
+// @desc    Get all gallery categories
+// @route   GET /api/gallery/categories
+// @access  Private (Admin)
+exports.getCategories = async (req, res) => {
+  try {
+    // Get all unique categories from the database
+    const categories = await Gallery.distinct('category');
+
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      data: categories
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 }; 

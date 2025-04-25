@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 const Login: React.FC = () => {
@@ -101,9 +101,7 @@ const Login: React.FC = () => {
         </form>
         
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Default credentials:</p>
-          <p>Email: admin@example.com</p>
-          <p>Password: admin123</p>
+       <a href='#' className='font-bold text-blue-800'>  Forgot Password</a>
         </div>
       </div>
     </div>

@@ -7,12 +7,15 @@ const MongoStore = require('connect-mongo');
 const path = require('path');
 const passport = require('passport');
 const { createDefaultAdmin } = require('./controllers/authController');
+const http = require('http');
+const socketIo = require('socket.io');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
 const galleryRoutes = require('./routes/gallery.routes');
 const jobRoutes = require('./routes/job.routes');
 const contactRoutes = require('./routes/contact.routes');
+const notificationRoutes = require('./routes/notification.routes');
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +23,37 @@ dotenv.config();
 // Initialize express app
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Setup Socket.IO
+const io = socketIo(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// Make io accessible to routes
+app.set('io', io);
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+  
+  // Join admin room if authenticated
+  socket.on('join-admin', (token) => {
+    // In a real app, validate token here
+    socket.join('admin-room');
+    console.log(`Socket ${socket.id} joined admin-room`);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
 
 // Middleware
 app.use(express.json());
@@ -65,6 +99,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -76,6 +111,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 }); 

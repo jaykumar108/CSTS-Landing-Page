@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const asyncHandler = require('express-async-handler');
 
 // Helper function to generate token
 const generateToken = (id) => {
@@ -122,4 +123,139 @@ exports.getMe = async (req, res) => {
     success: true,
     user
   });
-}; 
+};
+
+// @desc    Get user profile
+// @route   GET /api/auth/profile
+// @access  Private
+exports.getProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found'
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});
+
+// @desc    Update user profile
+// @route   PUT /api/auth/update-profile
+// @access  Private
+exports.updateProfile = asyncHandler(async (req, res) => {
+  const { username, email } = req.body;
+  
+  // Check if file was uploaded
+  let profileImage = undefined;
+  let cloudinaryId = undefined;
+  
+  if (req.file) {
+    profileImage = req.file.path;
+    cloudinaryId = req.file.filename;
+  }
+  
+  // Build update object
+  const updateData = {
+    username,
+    email
+  };
+  
+  // Only add image fields if a file was uploaded
+  if (profileImage) {
+    updateData.profileImage = profileImage;
+    updateData.cloudinaryId = cloudinaryId;
+  }
+  
+  // Update user
+  const user = await User.findByIdAndUpdate(
+    req.user.id,
+    updateData,
+    { new: true, runValidators: true }
+  ).select('-password');
+  
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});
+
+// @desc    Change user password
+// @route   PUT /api/auth/change-password
+// @access  Private
+exports.changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide current password and new password'
+    });
+  }
+
+  // Get user with password
+  const user = await User.findById(req.user.id).select('+password');
+
+  // Check if current password matches
+  const isMatch = await user.matchPassword(currentPassword);
+
+  if (!isMatch) {
+    return res.status(401).json({
+      success: false,
+      message: 'Current password is incorrect'
+    });
+  }
+
+  // Update password
+  user.password = newPassword;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Password updated successfully'
+  });
+});
+
+// @desc    Update admin profile image
+// @route   PUT /api/auth/admin/update-profile-image
+// @access  Private/Admin
+exports.updateAdminProfileImage = asyncHandler(async (req, res) => {
+  // Check if the user is admin
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Only admin users can access this route'
+    });
+  }
+  
+  // Check if file was uploaded
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please upload an image file'
+    });
+  }
+  
+  const profileImage = req.file.path;
+  const cloudinaryId = req.file.filename;
+  
+  // Update admin user
+  const updatedAdmin = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      profileImage,
+      cloudinaryId
+    },
+    { new: true, runValidators: true }
+  ).select('-password');
+  
+  res.status(200).json({
+    success: true,
+    data: updatedAdmin,
+    message: 'Admin profile image updated successfully'
+  });
+}); 

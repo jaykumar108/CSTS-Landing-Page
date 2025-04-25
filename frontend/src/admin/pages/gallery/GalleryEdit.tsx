@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from '../../components/Layout';
+import useAuth from '../../hooks/useAuth';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -18,6 +19,7 @@ interface GalleryItem {
 const GalleryEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { token } = useAuth();
   
   const [formData, setFormData] = useState({
     title: '',
@@ -38,7 +40,14 @@ const GalleryEdit: React.FC = () => {
     const fetchGalleryItem = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/gallery/${id}`);
+        
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        };
+        
+        const response = await axios.get(`${API_URL}/gallery/${id}`, config);
         const item: GalleryItem = response.data.data;
         
         setFormData({
@@ -61,7 +70,7 @@ const GalleryEdit: React.FC = () => {
     if (id) {
       fetchGalleryItem();
     }
-  }, [id]);
+  }, [id, token]);
   
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -106,16 +115,22 @@ const GalleryEdit: React.FC = () => {
         data.append('image', file);
       }
       
-      // Update gallery item
-      await axios.put(`${API_URL}/gallery/${id}`, data, {
+      // Update gallery item with authorization header
+      const config = {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
         }
-      });
+      };
+      
+      console.log('Updating gallery image with token:', token);
+      const response = await axios.put(`${API_URL}/gallery/${id}`, data, config);
+      console.log('Gallery update response:', response.data);
       
       // Redirect to gallery list
       navigate('/admin/gallery');
     } catch (err: any) {
+      console.error('Gallery update error:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Failed to update gallery item');
       setSaving(false);
     }

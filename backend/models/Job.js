@@ -54,6 +54,30 @@ const jobSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  department: {
+    type: String,
+    trim: true
+  },
+  duration: {
+    type: String,
+    trim: true
+  },
+  perks: {
+    type: String,
+    trim: true
+  },
+  note: {
+    type: String,
+    trim: true
+  },
+  languages: {
+    type: String,
+    trim: true
+  },
+  skills: {
+    type: [String],
+    default: []
   }
 }, {
   timestamps: true

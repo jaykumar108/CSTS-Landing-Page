@@ -1,6 +1,7 @@
 const express = require('express');
-const { login, logout, getMe } = require('../controllers/authController');
+const { login, logout, getMe, updateProfile, getProfile, changePassword, updateAdminProfileImage } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -8,5 +9,14 @@ const router = express.Router();
 router.post('/login', login);
 router.get('/logout', protect, logout);
 router.get('/me', protect, getMe);
+
+// Protected routes
+router.use(protect);
+router.get('/profile', getProfile);
+router.put('/update-profile', upload.single('profileImage'), updateProfile);
+router.put('/change-password', changePassword);
+
+// Admin specific routes
+router.put('/admin/update-profile-image', protect, upload.single('profileImage'), updateAdminProfileImage);
 
 module.exports = router; 

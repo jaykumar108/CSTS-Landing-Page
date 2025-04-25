@@ -1,53 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Clock, Gift, Laptop, Globe, ChevronRight, GraduationCap, Briefcase, HeartHandshake, Users, BrainCircuit, Star, BookOpen, Paintbrush } from 'lucide-react';
 import Footer from './Footer';
+import axios from 'axios';
 
-const jobData = [
-  {
-    id: 1,
-    title: 'Research Intern',
-    department: 'Cultural Research',
-    location: 'Darbhanga',
-    duration: 'Minimum 2 months',
-    perks: 'Certificate & Stipend',
-    note: 'A personal laptop is required',
-    type: 'Internship',
-    skills: ['Research', 'Data Analysis', 'Content Writing'],
-    description: 'Join our team as a Research Intern to contribute to our ongoing projects documenting cultural practices and traditions across Mithila region. You will assist in data collection, analysis, and report writing.'
-  },
-  {
-    id: 2,
-    title: 'Language Expert',
-    department: 'Language Documentation',
-    location: 'Remote',
-    languages: 'Maithili, Hindi, Sanskrit, Bhojpuri',
-    type: 'Remote Job',
-    skills: ['Translation', 'Proofreading', 'Linguistics'],
-    description: 'We are looking for language experts to help with translation, proofreading, and linguistic analysis of traditional texts and contemporary materials. A strong understanding of language structure and cultural context is essential.'
-  },
-  {
-    id: 3,
-    title: 'Data Annotator',
-    department: 'Digital Archives',
-    location: 'Remote',
-    languages: 'Maithili, Hindi, Sanskrit',
-    type: 'Remote Job',
-    skills: ['Data Labeling', 'Attention to Detail', 'Cultural Knowledge'],
-    description: 'Work with our digital archives team to annotate and categorize cultural and linguistic data. This role requires strong attention to detail and understanding of cultural nuances.'
-  },
-  {
-    id: 4,
-    title: 'Content Creator',
-    department: 'Digital Media',
-    location: 'Darbhanga/Remote',
-    duration: 'Full-time',
-    perks: 'Competitive Salary, Growth Opportunities',
-    skills: ['Content Writing', 'Social Media', 'Graphic Design'],
-    type: 'Full-time',
-    description: 'Create engaging content for our digital platforms to promote awareness about Mithila culture and traditions. Skills in writing, social media management, and basic graphic design are valuable.'
-  },
-];
+// Define the API URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Define Job type interface
+interface Job {
+  _id: string;
+  title: string;
+  company: string;
+  department?: string;
+  location: string;
+  type: string;
+  description: string;
+  requirements?: string;
+  skills?: string[];
+  salary?: string;
+  duration?: string;
+  perks?: string;
+  note?: string;
+  languages?: string;
+  applicationLink?: string;
+  contactEmail?: string;
+  isActive: boolean;
+  expiresAt: string;
+}
 
 // Animation variants
 const fadeInUp = {
@@ -100,9 +80,36 @@ const companyValues = [
 const Career = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('All');
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
+  // Fetch jobs from the API
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_URL}/jobs?isActive=true`);
+        console.log('API Response:', response.data);
+        
+        if (response.data && response.data.data) {
+          setJobs(response.data.data);
+        } else {
+          setError('Invalid data format received from server');
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        setError('Failed to load job listings. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
   // Filter jobs based on search term and type
-  const filteredJobs = jobData.filter(job => {
+  const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                         job.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedType === 'All' || job.type === selectedType;
@@ -154,50 +161,7 @@ const Career = () => {
         </div>
       </section>
 
-      {/* Company Values */}
-      <section className="py-16 bg-gradient-to-br from-white to-blue-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-        className="text-center mb-12"
-      >
-            <motion.h2 
-              variants={fadeInUp}
-              className="text-3xl font-bold text-gray-900 mb-4"
-            >
-              Our Values
-            </motion.h2>
-            <motion.p 
-              variants={fadeInUp}
-              custom={1}
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
-            >
-              What makes working with CSTS a unique and rewarding experience
-            </motion.p>
-      </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {companyValues.map((value, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all"
-              >
-                <div className="mb-4 p-3 rounded-full w-16 h-16 flex items-center justify-center bg-gray-50">
-                  {value.icon}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+   
 
       {/* Job Listings */}
       <section id="opportunities" className="py-16 bg-white">
@@ -222,6 +186,9 @@ const Career = () => {
               Explore our open positions and find the perfect fit for your skills and interests
             </motion.p>
           </motion.div>
+          
+
+
           
           {/* Search and Filter */}
           <div className="mb-8 flex flex-col md:flex-row gap-4">
@@ -259,9 +226,9 @@ const Career = () => {
                 Internships
               </button>
               <button 
-                onClick={() => setSelectedType('Remote Job')}
+                onClick={() => setSelectedType('Remote')}
                 className={`px-4 py-2 rounded-lg transition-all ${
-                  selectedType === 'Remote Job' 
+                  selectedType === 'Remote' 
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
@@ -282,113 +249,143 @@ const Career = () => {
               </button>
             </div>
           </div>
+
+
+          
+          
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+          
+          {/* Error State */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
           
           {/* Job Cards */}
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-          >
-            {filteredJobs.length === 0 ? (
-              <div className="col-span-2 text-center py-12 bg-gray-50 rounded-xl">
-                <p className="text-gray-500 text-lg">No positions found matching your criteria</p>
-                <button
-                  onClick={() => {setSearchTerm(''); setSelectedType('All');}}
-                  className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  Clear filters
-                </button>
-              </div>
-            ) : (
-              filteredJobs.map((job, index) => (
-                <motion.div
-                  key={job.id}
-                  variants={fadeInUp}
-                  custom={index}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all p-6 flex flex-col"
-          >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-2 ${
-                        job.type === 'Internship' 
-                          ? 'bg-green-100 text-green-800' 
-                          : job.type === 'Remote Job' 
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-purple-100 text-purple-800'
-                      }`}>
-                        {job.type}
-                      </span>
-                      <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
-                      <p className="text-gray-600">{job.department}</p>
-                    </div>
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      job.type === 'Internship' 
-                        ? 'bg-green-100' 
-                        : job.type === 'Remote Job' 
-                          ? 'bg-blue-100'
-                          : 'bg-purple-100'
-                    }`}>
-                      {job.type === 'Internship' 
-                        ? <GraduationCap className="w-6 h-6 text-green-600" />
-                        : job.type === 'Remote Job'
-                          ? <Globe className="w-6 h-6 text-blue-600" />
-                          : <Briefcase className="w-6 h-6 text-purple-600" />
-                      }
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-700 mb-4">{job.description}</p>
-                  
-                  {/* Job Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin className="w-4 h-4 text-gray-400" />
-                      <span>{job.location}</span>
-                    </div>
-                    {job.duration && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <span>{job.duration}</span>
-                      </div>
-                    )}
-                    {job.perks && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Gift className="w-4 h-4 text-gray-400" />
-                        <span>{job.perks}</span>
-                      </div>
-                    )}
-                    {job.note && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Laptop className="w-4 h-4 text-gray-400" />
-                        <span>{job.note}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Skills */}
-                  {job.skills && (
-                    <div className="mb-6 flex flex-wrap gap-2">
-                      {job.skills.map((skill, i) => (
-                        <span key={i} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs">
-                          {skill}
+          {!loading && !error && (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            >
+              {filteredJobs.length === 0 ? (
+                <div className="col-span-2 text-center py-12 bg-gray-50 rounded-xl">
+                  <p className="text-gray-500 text-lg">No positions found matching your criteria</p>
+                  <button
+                    onClick={() => {setSearchTerm(''); setSelectedType('All');}}
+                    className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              ) : (
+                filteredJobs.map((job, index) => (
+                  <motion.div
+                    key={job._id}
+                    variants={fadeInUp}
+                    custom={index}
+                    whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                    className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all p-6 flex flex-col"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-2 ${
+                          job.type === 'Internship' 
+                            ? 'bg-green-100 text-green-800' 
+                            : job.type === 'Remote' 
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-purple-100 text-purple-800'
+                        }`}>
+                          {job.type}
                         </span>
-                      ))}
+                        <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
+                        <p className="text-gray-600">{job.department || job.company}</p>
+                      </div>
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                        job.type === 'Internship' 
+                          ? 'bg-green-100' 
+                          : job.type === 'Remote' 
+                            ? 'bg-blue-100'
+                            : 'bg-purple-100'
+                      }`}>
+                        {job.type === 'Internship' 
+                          ? <GraduationCap className="w-6 h-6 text-green-600" />
+                          : job.type === 'Remote'
+                            ? <Globe className="w-6 h-6 text-blue-600" />
+                            : <Briefcase className="w-6 h-6 text-purple-600" />
+                        }
+                      </div>
                     </div>
-                  )}
-            
-                  <div className="mt-auto">
-                    <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors">
-              Apply Now
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </motion.div>
+                    
+                    <p className="text-gray-700 mb-4">{job.description}</p>
+                    
+                    {/* Job Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <MapPin className="w-4 h-4 text-gray-400" />
+                        <span>{job.location}</span>
+                      </div>
+                      {job.duration && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Clock className="w-4 h-4 text-gray-400" />
+                          <span>{job.duration}</span>
+                        </div>
+                      )}
+                      {job.perks && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Gift className="w-4 h-4 text-gray-400" />
+                          <span>{job.perks}</span>
+                        </div>
+                      )}
+                      {job.note && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Laptop className="w-4 h-4 text-gray-400" />
+                          <span>{job.note}</span>
+                        </div>
+                      )}
+                      {job.salary && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Gift className="w-4 h-4 text-gray-400" />
+                          <span>{job.salary}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Skills */}
+                    {job.skills && job.skills.length > 0 && (
+                      <div className="mb-6 flex flex-wrap gap-2">
+                        {job.skills.map((skill, i) => (
+                          <span key={i} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+              
+                    <div className="mt-auto">
+                      <a 
+                        href={job.applicationLink || `mailto:${job.contactEmail || 'careers@csts.org'}`}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+                      >
+                        Apply Now
+                        <ChevronRight className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -481,6 +478,51 @@ const Career = () => {
                 Apply to Volunteer
         </motion.button>
       </motion.div>
+          </div>
+        </div>
+      </section>
+
+               {/* Company Values */}
+      <section className="py-16 bg-gradient-to-br from-white to-blue-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+        className="text-center mb-12"
+      >
+            <motion.h2 
+              variants={fadeInUp}
+              className="text-3xl font-bold text-gray-900 mb-4"
+            >
+              Our Values
+            </motion.h2>
+            <motion.p 
+              variants={fadeInUp}
+              custom={1}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+            >
+              What makes working with CSTS a unique and rewarding experience
+            </motion.p>
+      </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {companyValues.map((value, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all"
+              >
+                <div className="mb-4 p-3 rounded-full w-16 h-16 flex items-center justify-center bg-gray-50">
+                  {value.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{value.title}</h3>
+                <p className="text-gray-600">{value.description}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

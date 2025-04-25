@@ -9,6 +9,8 @@ interface User {
   username: string;
   email: string;
   role: string;
+  profileImage?: string;
+  cloudinaryId?: string;
 }
 
 interface AuthContextType {
@@ -19,6 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   error: string | null;
+  refreshUser: () => Promise<void>;
 }
 
 // Create context
@@ -29,7 +32,8 @@ export const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: async () => {},
   logout: async () => {},
-  error: null
+  error: null,
+  refreshUser: async () => {}
 });
 
 // Provider props
@@ -115,6 +119,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Refresh user data
+  const refreshUser = async () => {
+    if (token) {
+      try {
+        const res = await axios.get(`${API_URL}/auth/me`);
+        setUser(res.data.user);
+      } catch (err) {
+        console.error('Error refreshing user data:', err);
+      }
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -124,7 +140,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isLoading,
         login,
         logout,
-        error
+        error,
+        refreshUser
       }}
     >
       {children}

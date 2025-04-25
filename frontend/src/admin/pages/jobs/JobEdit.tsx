@@ -16,6 +16,15 @@ interface Job {
   isActive: boolean;
   expiresAt: string;
   createdAt: string;
+  department?: string;
+  duration?: string;
+  perks?: string;
+  note?: string;
+  languages?: string;
+  skills?: string[];
+  salary?: string;
+  applicationLink?: string;
+  contactEmail?: string;
 }
 
 const JobEdit: React.FC = () => {
@@ -26,9 +35,18 @@ const JobEdit: React.FC = () => {
     title: '',
     company: '',
     location: '',
-    type: 'full-time',
+    type: 'Full-time',
     description: '',
     requirements: '',
+    department: '',
+    duration: '',
+    perks: '',
+    note: '',
+    languages: '',
+    skills: '',
+    salary: '',
+    applicationLink: '',
+    contactEmail: '',
     isActive: true,
     expiresAt: ''
   });
@@ -57,6 +75,16 @@ const JobEdit: React.FC = () => {
           type: job.type,
           description: job.description || '',
           requirements: job.requirements || '',
+          department: job.department || '',
+          duration: job.duration || '',
+          perks: job.perks || '',
+          note: job.note || '',
+          languages: job.languages || '',
+          // Convert skills array to comma-separated string
+          skills: job.skills ? job.skills.join(', ') : '',
+          salary: job.salary || '',
+          applicationLink: job.applicationLink || '',
+          contactEmail: job.contactEmail || '',
           isActive: job.isActive,
           expiresAt: expiryDate
         });
@@ -91,11 +119,18 @@ const JobEdit: React.FC = () => {
       setSaving(true);
       setError(null);
       
-      await axios.put(`${API_URL}/jobs/${id}`, formData);
+      // Process skills as array
+      const jobData = {
+        ...formData,
+        skills: formData.skills ? formData.skills.split(',').map(skill => skill.trim()) : []
+      };
+      
+      await axios.put(`${API_URL}/jobs/${id}`, jobData);
       
       // Redirect to jobs list
       navigate('/admin/jobs');
     } catch (err: any) {
+      console.error('Error updating job:', err.response?.data || err);
       setError(err.response?.data?.message || 'Failed to update job');
       setSaving(false);
     }
@@ -111,6 +146,12 @@ const JobEdit: React.FC = () => {
             {error && (
               <div className="mb-6 p-4 rounded-md bg-red-100 text-red-700">
                 {error}
+                <button 
+                  onClick={() => setError(null)} 
+                  className="float-right text-red-700 font-bold"
+                >
+                  &times;
+                </button>
               </div>
             )}
             
@@ -167,23 +208,119 @@ const JobEdit: React.FC = () => {
                   </div>
                 </div>
                 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+                      Job Type*
+                    </label>
+                    <select
+                      id="type"
+                      name="type"
+                      value={formData.type}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contract">Contract</option>
+                      <option value="Internship">Internship</option>
+                      <option value="Remote">Remote</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+                      Department
+                    </label>
+                    <input
+                      type="text"
+                      id="department"
+                      name="department"
+                      value={formData.department}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+                      Duration
+                    </label>
+                    <input
+                      type="text"
+                      id="duration"
+                      name="duration"
+                      value={formData.duration}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. 6 months, 1 year"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="salary" className="block text-sm font-medium text-gray-700 mb-1">
+                      Salary
+                    </label>
+                    <input
+                      type="text"
+                      id="salary"
+                      name="salary"
+                      value={formData.salary}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. $50,000 - $70,000"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label htmlFor="perks" className="block text-sm font-medium text-gray-700 mb-1">
+                      Perks
+                    </label>
+                    <input
+                      type="text"
+                      id="perks"
+                      name="perks"
+                      value={formData.perks}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Health insurance, Flexible hours"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-1">
+                      Note
+                    </label>
+                    <input
+                      type="text"
+                      id="note"
+                      name="note"
+                      value={formData.note}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Laptop required"
+                    />
+                  </div>
+                </div>
+                
                 <div className="mb-6">
-                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                    Job Type
+                  <label htmlFor="languages" className="block text-sm font-medium text-gray-700 mb-1">
+                    Languages
                   </label>
-                  <select
-                    id="type"
-                    name="type"
-                    value={formData.type}
+                  <input
+                    type="text"
+                    id="languages"
+                    name="languages"
+                    value={formData.languages}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="freelance">Freelance</option>
-                    <option value="internship">Internship</option>
-                  </select>
+                    placeholder="e.g. English, Hindi, Spanish"
+                  />
                 </div>
                 
                 <div className="mb-6">
@@ -195,7 +332,7 @@ const JobEdit: React.FC = () => {
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    rows={6}
+                    rows={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -203,7 +340,7 @@ const JobEdit: React.FC = () => {
                 
                 <div className="mb-6">
                   <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1">
-                    Requirements
+                    Requirements*
                   </label>
                   <textarea
                     id="requirements"
@@ -212,16 +349,63 @@ const JobEdit: React.FC = () => {
                     onChange={handleChange}
                     rows={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                
+                <div className="mb-6">
+                  <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
+                    Skills
+                  </label>
+                  <input
+                    type="text"
+                    id="skills"
+                    name="skills"
+                    value={formData.skills}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. React, JavaScript, CSS (comma separated)"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    Enter each requirement on a new line
+                    Separate skills with commas
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
+                    <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                      Contact Email
+                    </label>
+                    <input
+                      type="email"
+                      id="contactEmail"
+                      name="contactEmail"
+                      value={formData.contactEmail}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="applicationLink" className="block text-sm font-medium text-gray-700 mb-1">
+                      Application Link
+                    </label>
+                    <input
+                      type="url"
+                      id="applicationLink"
+                      name="applicationLink"
+                      value={formData.applicationLink}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
                     <label htmlFor="expiresAt" className="block text-sm font-medium text-gray-700 mb-1">
-                      Expiry Date
+                      Expiry Date*
                     </label>
                     <input
                       type="date"
@@ -230,6 +414,7 @@ const JobEdit: React.FC = () => {
                       value={formData.expiresAt}
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
                     />
                   </div>
                   

@@ -9,10 +9,17 @@ interface Contact {
   _id: string;
   name: string;
   email: string;
+  phone: string;
   subject: string;
   message: string;
   status: string;
+  notes: string;
   createdAt: string;
+}
+
+interface ReplyData {
+  subject: string;
+  message: string;
 }
 
 const ContactDetails: React.FC = () => {
@@ -21,29 +28,116 @@ const ContactDetails: React.FC = () => {
   const [contact, setContact] = useState<Contact | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [reply, setReply] = useState<string>('');
-  const [isSending, setIsSending] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showReplyForm, setShowReplyForm] = useState<boolean>(false);
+  const [replyData, setReplyData] = useState<ReplyData>({
+    subject: '',
+    message: '',
+  });
+  const [notes, setNotes] = useState<string>('');
+  const [statusUpdated, setStatusUpdated] = useState<boolean>(false);
 
   // Fetch contact details
   useEffect(() => {
-    const fetchContactDetails = async () => {
+    const fetchContact = async () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_URL}/contacts/${id}`);
         setContact(response.data.data);
+        setNotes(response.data.data.notes || '');
         setLoading(false);
+        
+        // Auto update status to 'read' if it's 'new'
+        if (response.data.data.status === 'new') {
+          await handleStatusChange('read');
+        }
       } catch (err) {
-        console.error('Error fetching contact details:', err);
+        console.error('Error fetching contact:', err);
         setError('Failed to load contact details');
         setLoading(false);
       }
     };
 
     if (id) {
-      fetchContactDetails();
+      fetchContact();
     }
   }, [id]);
+
+  // Handle reply input changes
+  const handleReplyChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setReplyData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handle status change
+  const handleStatusChange = async (newStatus: string) => {
+    try {
+      await axios.put(`${API_URL}/contacts/${id}`, { status: newStatus });
+      setContact(prev => prev ? { ...prev, status: newStatus } : null);
+      setStatusUpdated(true);
+      
+      // Hide status updated message after 3 seconds
+      setTimeout(() => {
+        setStatusUpdated(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Error updating contact status:', err);
+      setError('Failed to update contact status');
+    }
+  };
+
+  // Handle notes update
+  const handleNotesUpdate = async () => {
+    try {
+      await axios.put(`${API_URL}/contacts/${id}`, { notes });
+      setStatusUpdated(true);
+      
+      // Hide status updated message after 3 seconds
+      setTimeout(() => {
+        setStatusUpdated(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Error updating notes:', err);
+      setError('Failed to update notes');
+    }
+  };
+
+  // Handle reply submission
+  const handleReplySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Here you would implement the email sending logic
+      // For now, we'll just update the status to 'replied'
+      await axios.put(`${API_URL}/contacts/${id}`, { 
+        status: 'replied',
+        notes: notes + `\n\n[${new Date().toLocaleString()}] Replied: ${replyData.subject} - ${replyData.message}` 
+      });
+      
+      setContact(prev => prev ? { ...prev, status: 'replied' } : null);
+      setShowReplyForm(false);
+      setReplyData({ subject: '', message: '' });
+      
+      // Auto-refresh the contact details
+      const response = await axios.get(`${API_URL}/contacts/${id}`);
+      setContact(response.data.data);
+      setNotes(response.data.data.notes || '');
+    } catch (err) {
+      console.error('Error sending reply:', err);
+      setError('Failed to send reply');
+    }
+  };
+
+  // Handle delete
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this contact?')) {
+      try {
+        await axios.delete(`${API_URL}/contacts/${id}`);
+        navigate('/admin/contacts');
+      } catch (err) {
+        console.error('Error deleting contact:', err);
+        setError('Failed to delete the contact');
+      }
+    }
+  };
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -51,169 +145,196 @@ const ContactDetails: React.FC = () => {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
 
-  // Handle status change
-  const handleStatusChange = async (newStatus: string) => {
-    if (!contact) return;
-    
-    try {
-      await axios.put(`${API_URL}/contacts/${id}`, { status: newStatus });
-      setContact({ ...contact, status: newStatus });
-    } catch (err) {
-      console.error('Error updating contact status:', err);
-      setError('Failed to update status');
+  // Get status badge color
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'new':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'read':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'replied':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'resolved':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'spam':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  // Handle sending reply
-  const handleSendReply = async () => {
-    if (!contact || !reply.trim()) return;
-    
-    setIsSending(true);
-    try {
-      await axios.post(`${API_URL}/contacts/${id}/reply`, { 
-        message: reply,
-        email: contact.email,
-        name: contact.name,
-        subject: `Re: ${contact.subject}`
-      });
-      
-      // Update status to replied
-      await handleStatusChange('replied');
-      
-      setSuccessMessage('Reply sent successfully');
-      setReply('');
-      setIsSending(false);
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
-    } catch (err) {
-      console.error('Error sending reply:', err);
-      setError('Failed to send reply');
-      setIsSending(false);
-    }
-  };
-
-  // Handle delete
-  const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this contact message?')) {
-      return;
-    }
-    
-    try {
-      await axios.delete(`${API_URL}/contacts/${id}`);
-      navigate('/admin/contacts');
-    } catch (err) {
-      console.error('Error deleting contact:', err);
-      setError('Failed to delete the contact');
-    }
-  };
-
-  return (
-    <Layout title={contact ? `Message from ${contact.name}` : 'Contact Details'}>
-      <div className="mb-4 flex justify-between items-center">
-        <button 
-          onClick={() => navigate('/admin/contacts')}
-          className="text-blue-600 hover:text-blue-800 flex items-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-          </svg>
-          Back to Contacts
-        </button>
-        
-        {contact && (
-          <div className="flex space-x-2">
-            <select
-              value={contact.status}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className="px-3 py-1 bg-gray-100 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="new">New</option>
-              <option value="read">Read</option>
-              <option value="replied">Replied</option>
-              <option value="resolved">Resolved</option>
-              <option value="spam">Spam</option>
-            </select>
-            
-            <button
-              onClick={handleDelete}
-              className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-sm"
-            >
-              Delete
-            </button>
-          </div>
-        )}
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-      
-      {successMessage && (
-        <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-          {successMessage}
-        </div>
-      )}
-
-      {loading ? (
+  if (loading) {
+    return (
+      <Layout title="Contact Details">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      ) : contact ? (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">From</h3>
-                <p className="text-gray-900">{contact.name} &lt;{contact.email}&gt;</p>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Date</h3>
-                <p className="text-gray-900">{formatDate(contact.createdAt)}</p>
-              </div>
-              
-              <div className="md:col-span-2">
-                <h3 className="text-sm font-medium text-gray-500">Subject</h3>
-                <p className="text-gray-900 text-lg font-medium">{contact.subject}</p>
-              </div>
-            </div>
-            
-            <div className="mb-8">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Message</h3>
-              <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
-                {contact.message}
-              </div>
-            </div>
-            
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout title="Contact Details">
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+        <button 
+          onClick={() => navigate('/admin/contacts')}
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+        >
+          Back to List
+        </button>
+      </Layout>
+    );
+  }
+
+  if (!contact) {
+    return (
+      <Layout title="Contact Details">
+        <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+          Contact not found
+        </div>
+        <button 
+          onClick={() => navigate('/admin/contacts')}
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+        >
+          Back to List
+        </button>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout title={`Contact from ${contact.name}`}>
+      <div className="mb-4 flex justify-between items-center">
+        <button 
+          onClick={() => navigate('/admin/contacts')}
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+        >
+          Back to List
+        </button>
+        <div className="flex space-x-2">
+          <button 
+            onClick={() => setShowReplyForm(!showReplyForm)}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            {showReplyForm ? 'Cancel Reply' : 'Reply'}
+          </button>
+          <button 
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      {statusUpdated && (
+        <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+          Updates saved successfully!
+        </div>
+      )}
+
+      <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-6">
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Reply</h3>
-              <textarea
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                placeholder="Type your reply here..."
-                className="w-full h-36 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              
-              <div className="mt-2 flex justify-end">
-                <button
-                  onClick={handleSendReply}
-                  disabled={isSending || !reply.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-300"
-                >
-                  {isSending ? 'Sending...' : 'Send Reply'}
-                </button>
-              </div>
+              <h2 className="text-xl font-semibold text-gray-800">{contact.subject}</h2>
+              <p className="text-sm text-gray-500">From: {contact.name} &lt;{contact.email}&gt;</p>
+              {contact.phone && <p className="text-sm text-gray-500">Phone: {contact.phone}</p>}
+              <p className="text-sm text-gray-500">Received: {formatDate(contact.createdAt)}</p>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className={`inline-flex px-3 py-1 text-sm rounded-full font-medium ${getStatusColor(contact.status)} border mb-2`}>
+                {contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}
+              </span>
+              <select
+                value={contact.status}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="new">New</option>
+                <option value="read">Read</option>
+                <option value="replied">Replied</option>
+                <option value="resolved">Resolved</option>
+                <option value="spam">Spam</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 pt-4">
+            <div className="prose max-w-none">
+              <p>{contact.message}</p>
             </div>
           </div>
         </div>
-      ) : (
-        <div className="bg-gray-50 p-6 rounded-lg text-center">
-          <p className="text-gray-600">Contact not found</p>
+      </div>
+
+      <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Notes</h3>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="w-full h-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Add private notes about this contact..."
+          ></textarea>
+          <div className="mt-2 flex justify-end">
+            <button 
+              onClick={handleNotesUpdate}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Save Notes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {showReplyForm && (
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Reply to Contact</h3>
+            <form onSubmit={handleReplySubmit}>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subject">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={replyData.subject}
+                  onChange={handleReplyChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Re: "
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="message">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={replyData.message}
+                  onChange={handleReplyChange}
+                  className="w-full h-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Type your reply..."
+                  required
+                ></textarea>
+              </div>
+              <div className="flex justify-end">
+                <button 
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Send Reply
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </Layout>

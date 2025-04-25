@@ -22,6 +22,7 @@ import MaithiliMachaan from './components/MaithiliMachaan';
 import MLF from './components/MLF';
 // Admin imports
 import AuthProvider from './admin/context/AuthContext';
+import SocketProvider from './admin/context/SocketContext';
 import AdminRoutes from './admin/pages/AdminRoutes';
 
 function App() {
@@ -31,7 +32,11 @@ function App() {
         <div className="font-sans">
           <Routes>
             {/* Admin routes */}
-            <Route path="/admin/*" element={<AdminRoutes />} />
+            <Route path="/admin/*" element={
+              <SocketProvider>
+                <AdminRoutes />
+              </SocketProvider>
+            } />
             
             {/* Public routes */}
             <Route path="/" element={

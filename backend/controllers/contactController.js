@@ -1,4 +1,5 @@
 const Contact = require('../models/Contact');
+const Notification = require('../models/Notification');
 
 // @desc    Submit contact form
 // @route   POST /api/contacts
@@ -19,6 +20,23 @@ exports.submitContact = async (req, res) => {
       message,
       ipAddress
     });
+
+    // Create notification for new contact
+    const notification = await Notification.create({
+      type: 'contact',
+      title: 'New Contact Message',
+      message: `New message from ${name}: ${subject}`,
+      sourceId: contact._id
+    });
+
+    // Emit socket event for real-time notification
+    const io = req.app.get('io');
+    if (io) {
+      io.to('admin-room').emit('new-notification', {
+        notification,
+        contact
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -44,7 +62,7 @@ exports.getAllContacts = async (req, res) => {
     const reqQuery = { ...req.query };
     
     // Fields to exclude from filtering
-    const removeFields = ['select', 'sort', 'page', 'limit'];
+    const removeFields = ['select', 'sort', 'page', 'limit', 'search'];
     
     // Delete fields from reqQuery
     removeFields.forEach(param => delete reqQuery[param]);
@@ -55,8 +73,25 @@ exports.getAllContacts = async (req, res) => {
     // Create operators ($gt, $gte, etc)
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
     
+    // Base query from filters
+    let queryObj = JSON.parse(queryStr);
+    
+    // Add search functionality
+    if (req.query.search) {
+      const searchRegex = new RegExp(req.query.search, 'i');
+      queryObj = {
+        ...queryObj,
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+          { subject: searchRegex },
+          { message: searchRegex }
+        ]
+      };
+    }
+    
     // Finding resources
-    query = Contact.find(JSON.parse(queryStr));
+    query = Contact.find(queryObj);
     
     // Select fields
     if (req.query.select) {
@@ -72,12 +107,14 @@ exports.getAllContacts = async (req, res) => {
       query = query.sort('-createdAt');
     }
     
+    // Count total before pagination
+    const total = await Contact.countDocuments(queryObj);
+    
     // Pagination
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    const total = await Contact.countDocuments(JSON.parse(queryStr));
     
     query = query.skip(startIndex).limit(limit);
     

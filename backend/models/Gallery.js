@@ -20,8 +20,8 @@ const gallerySchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['event', 'product', 'team', 'other'],
-    default: 'other'
+    required: [true, 'Category is required'],
+    trim: true
   },
   isPublished: {
     type: Boolean,

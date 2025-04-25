@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from '../../components/Layout';
+import useAuth from '../../hooks/useAuth';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const GalleryAdd: React.FC = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
   
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'other',
+    category: '',
+    customCategory: '',
     isPublished: true
   });
   
@@ -19,10 +22,43 @@ const GalleryAdd: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>(['event', 'product', 'team', 'other']);
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+  
+  // Fetch existing categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        };
+        
+        const response = await axios.get(`${API_URL}/gallery/categories`, config);
+        if (response.data && response.data.data) {
+          // Add default categories if they don't exist
+          const allCategories = [...new Set([...response.data.data, 'event', 'product', 'team', 'other'])];
+          setCategories(allCategories);
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    };
+    
+    fetchCategories();
+  }, [token]);
   
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    if (name === 'category' && value === 'custom') {
+      setShowCustomCategory(true);
+    } else if (name === 'category') {
+      setShowCustomCategory(false);
+    }
+    
     setFormData({
       ...formData,
       [name]: e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
@@ -57,24 +93,39 @@ const GalleryAdd: React.FC = () => {
       setLoading(true);
       setError(null);
       
+      // Determine the actual category - use custom or selected one
+      const finalCategory = showCustomCategory ? formData.customCategory.trim() : formData.category;
+      
+      if (showCustomCategory && !formData.customCategory.trim()) {
+        setError('Please enter a custom category name');
+        setLoading(false);
+        return;
+      }
+      
       // Create form data for file upload
       const data = new FormData();
       data.append('title', formData.title);
       data.append('description', formData.description);
-      data.append('category', formData.category);
+      data.append('category', finalCategory);
       data.append('isPublished', String(formData.isPublished));
       data.append('image', file);
       
-      // Upload image
-      await axios.post(`${API_URL}/gallery`, data, {
+      // Upload image with authorization header
+      const config = {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
         }
-      });
+      };
+      
+      console.log('Uploading gallery image with token:', token);
+      const response = await axios.post(`${API_URL}/gallery`, data, config);
+      console.log('Gallery upload response:', response.data);
       
       // Redirect to gallery list
       navigate('/admin/gallery');
     } catch (err: any) {
+      console.error('Gallery upload error:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Failed to upload image');
       setLoading(false);
     }
@@ -134,12 +185,31 @@ const GalleryAdd: React.FC = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="event">Event</option>
-                  <option value="product">Product</option>
-                  <option value="team">Team</option>
-                  <option value="other">Other</option>
+                  <option value="">Select a category</option>
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                  <option value="custom">+ Add New Category</option>
                 </select>
               </div>
+              
+              {showCustomCategory && (
+                <div className="mb-6">
+                  <label htmlFor="customCategory" className="block text-sm font-medium text-gray-700 mb-1">
+                    New Category Name*
+                  </label>
+                  <input
+                    type="text"
+                    id="customCategory"
+                    name="customCategory"
+                    value={formData.customCategory}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter a new category name"
+                    required={showCustomCategory}
+                  />
+                </div>
+              )}
               
               <div className="mb-6">
                 <div className="flex items-center">

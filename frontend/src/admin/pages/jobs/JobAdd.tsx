@@ -12,9 +12,18 @@ const JobAdd: React.FC = () => {
     title: '',
     company: '',
     location: '',
-    type: 'full-time',
+    type: 'Full-time',
     description: '',
     requirements: '',
+    department: '',
+    duration: '',
+    perks: '',
+    note: '',
+    languages: '',
+    skills: '',
+    salary: '',
+    applicationLink: '',
+    contactEmail: '',
     isActive: true,
     expiresAt: getDefaultExpiryDate()
   });
@@ -46,11 +55,18 @@ const JobAdd: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      await axios.post(`${API_URL}/jobs`, formData);
+      // Process skills as array
+      const jobData = {
+        ...formData,
+        skills: formData.skills ? formData.skills.split(',').map(skill => skill.trim()) : []
+      };
+      
+      await axios.post(`${API_URL}/jobs`, jobData);
       
       // Redirect to jobs list
       navigate('/admin/jobs');
     } catch (err: any) {
+      console.error('Error creating job:', err.response?.data || err);
       setError(err.response?.data?.message || 'Failed to create job listing');
       setLoading(false);
     }
@@ -117,23 +133,104 @@ const JobAdd: React.FC = () => {
                 </div>
               </div>
               
-              <div className="mb-6">
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Type
-                </label>
-                <select
-                  id="type"
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="full-time">Full-time</option>
-                  <option value="part-time">Part-time</option>
-                  <option value="contract">Contract</option>
-                  <option value="freelance">Freelance</option>
-                  <option value="internship">Internship</option>
-                </select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+                    Job Type*
+                  </label>
+                  <select
+                    id="type"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Remote">Remote</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+                    Duration
+                  </label>
+                  <input
+                    type="text"
+                    id="duration"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. 6 months, 1 year"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="salary" className="block text-sm font-medium text-gray-700 mb-1">
+                    Salary
+                  </label>
+                  <input
+                    type="text"
+                    id="salary"
+                    name="salary"
+                    value={formData.salary}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. $50,000 - $70,000"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label htmlFor="perks" className="block text-sm font-medium text-gray-700 mb-1">
+                    Perks
+                  </label>
+                  <input
+                    type="text"
+                    id="perks"
+                    name="perks"
+                    value={formData.perks}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. Health insurance, Flexible hours"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-1">
+                    Note
+                  </label>
+                  <input
+                    type="text"
+                    id="note"
+                    name="note"
+                    value={formData.note}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g. Laptop required"
+                  />
+                </div>
               </div>
               
               <div className="mb-6">
@@ -145,7 +242,7 @@ const JobAdd: React.FC = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  rows={6}
+                  rows={4}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -153,7 +250,7 @@ const JobAdd: React.FC = () => {
               
               <div className="mb-6">
                 <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 mb-1">
-                  Requirements
+                  Requirements*
                 </label>
                 <textarea
                   id="requirements"
@@ -162,16 +259,63 @@ const JobAdd: React.FC = () => {
                   onChange={handleChange}
                   rows={4}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              
+              <div className="mb-6">
+                <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
+                  Skills
+                </label>
+                <input
+                  type="text"
+                  id="skills"
+                  name="skills"
+                  value={formData.skills}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g. React, JavaScript, CSS (comma separated)"
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  Enter each requirement on a new line
+                  Separate skills with commas
                 </p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
+                  <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                    Contact Email
+                  </label>
+                  <input
+                    type="email"
+                    id="contactEmail"
+                    name="contactEmail"
+                    value={formData.contactEmail}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="applicationLink" className="block text-sm font-medium text-gray-700 mb-1">
+                    Application Link
+                  </label>
+                  <input
+                    type="url"
+                    id="applicationLink"
+                    name="applicationLink"
+                    value={formData.applicationLink}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
                   <label htmlFor="expiresAt" className="block text-sm font-medium text-gray-700 mb-1">
-                    Expiry Date
+                    Expiry Date*
                   </label>
                   <input
                     type="date"
@@ -180,6 +324,7 @@ const JobAdd: React.FC = () => {
                     value={formData.expiresAt}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
                   />
                 </div>
                 
