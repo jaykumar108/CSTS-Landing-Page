@@ -258,4 +258,15 @@ exports.updateAdminProfileImage = asyncHandler(async (req, res) => {
     data: updatedAdmin,
     message: 'Admin profile image updated successfully'
   });
-}); 
+});
+
+// @desc    Check API connection
+// @route   GET /api/auth/check
+// @access  Private
+exports.checkConnection = async (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Connection successful',
+    timestamp: new Date().toISOString()
+  });
+}; 

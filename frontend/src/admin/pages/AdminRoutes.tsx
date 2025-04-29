@@ -16,6 +16,11 @@ import JobAdd from './jobs/JobAdd';
 import JobEdit from './jobs/JobEdit';
 import ContactList from './contacts/ContactList';
 import ContactView from './contacts/ContactView';
+import CollaboratorList from './collaborators/CollaboratorList';
+import CollaboratorForm from './collaborators/CollaboratorForm';
+import EventList from './events/EventList';
+import EventAdd from './events/EventAdd';
+import EventEdit from './events/EventEdit';
 
 const AdminRoutes: React.FC = () => {
   return (
@@ -41,6 +46,16 @@ const AdminRoutes: React.FC = () => {
         {/* Contact Routes */}
         <Route path="contacts" element={<ContactList />} />
         <Route path="contacts/:id" element={<ContactView />} />
+        
+        {/* Collaborator Routes */}
+        <Route path="collaborators" element={<CollaboratorList />} />
+        <Route path="collaborators/add" element={<CollaboratorForm />} />
+        <Route path="collaborators/:id/edit" element={<CollaboratorForm />} />
+        
+        {/* Event Routes */}
+        <Route path="events" element={<EventList />} />
+        <Route path="events/add" element={<EventAdd />} />
+        <Route path="events/edit/:id" element={<EventEdit />} />
         
         {/* Default Redirect */}
         <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />

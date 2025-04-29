@@ -24,12 +24,12 @@ import MLF from './components/MLF';
 import AuthProvider from './admin/context/AuthContext';
 import SocketProvider from './admin/context/SocketContext';
 import AdminRoutes from './admin/pages/AdminRoutes';
-
+import EventSlider from './components/EventSlider';
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="font-sans">
+        <div className="font-sans min-h-screen">
           <Routes>
             {/* Admin routes */}
             <Route path="/admin/*" element={
@@ -153,6 +153,15 @@ function App() {
                 <Header />
                 <main>
                   <MLF/>
+                </main>
+                
+              </>
+            } />
+            <Route path="/events" element={
+              <>
+                <Header />
+                <main>
+                  <EventSlider />
                 </main>
               </>
             } />

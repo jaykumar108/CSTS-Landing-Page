@@ -1,6 +1,6 @@
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('../config/cloudinary');
+const { cloudinary } = require('../config/cloudinary');
 const path = require('path');
 const asyncHandler = require('express-async-handler');
 
@@ -8,9 +8,10 @@ const asyncHandler = require('express-async-handler');
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'admin-panel',
+    folder: 'gallery',
     allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
-    transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
+    transformation: [{ width: 1000, height: 1000, crop: 'limit' }],
+    format: 'png'
   }
 });
 

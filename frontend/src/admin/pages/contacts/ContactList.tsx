@@ -27,7 +27,8 @@ const ContactList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [totalContacts, setTotalContacts] = useState<number>(0);
-  const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
 
   const { token } = useAuth();
   const { socket } = useSocket();
@@ -47,7 +48,10 @@ const ContactList: React.FC = () => {
             page: currentPage,
             limit: 10,
             sort: '-createdAt',
-            ...(searchQuery ? { search: searchQuery } : {})
+            ...(searchQuery ? { search: searchQuery } : {}),
+            ...(statusFilter !== 'all' ? { status: statusFilter } : {}),
+            ...(startDate ? { startDate } : {}),
+            ...(endDate ? { endDate } : {})
           }
         };
 
@@ -75,7 +79,7 @@ const ContactList: React.FC = () => {
       setError('You must be logged in to view contacts');
       setLoading(false);
     }
-  }, [currentPage, searchQuery, token]);
+  }, [currentPage, searchQuery, statusFilter, startDate, endDate, token]);
 
   // Listen for real-time contact updates
   useEffect(() => {
@@ -165,32 +169,17 @@ const ContactList: React.FC = () => {
     }
   };
 
-  // Filter contacts based on status and search query
-  useEffect(() => {
-    let filtered = contacts;
-    
-    // Apply status filter if not 'all'
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(contact => contact.status === statusFilter);
-    }
-    
-    // Apply search filter if query exists
-    if (searchQuery) {
-      filtered = filtered.filter(contact => 
-        contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        contact.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (contact.phone && contact.phone.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    }
-    
-    setFilteredContacts(filtered);
-  }, [contacts, statusFilter, searchQuery]);
-
   // Function to handle search
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // Clear date filters
+  const clearDateFilters = () => {
+    setStartDate('');
+    setEndDate('');
+    setCurrentPage(1); // Reset to first page when clearing filters
   };
 
   // Calculate pagination values
@@ -199,30 +188,32 @@ const ContactList: React.FC = () => {
 
   return (
     <Layout title="Contact Messages">
-      <div className="mb-1 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-       
-        
-        <div className="flex flex-col md:flex-row gap-1 md:items-center mt-2">
+      <div className="mb-6">
+        <div className="flex flex-wrap items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
           {/* Search box */}
-          <div className="w-full md:w-1/1 flex mb-4">
+          <div className="flex-1 min-w-[200px]">
             <input
               type="text" 
               placeholder="Search contacts..."
-              className="w-full px-4 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={searchQuery}
               onChange={handleSearch}
             />
           </div>
           
-          <div className="flex items-center space-x-2">
-            <label htmlFor="status-filter" className="text-sm text-gray-600 p-2 mb-4">
-              Filter by status:
+          {/* Status filter */}
+          <div className="flex items-center">
+            <label htmlFor="status-filter" className="text-sm text-gray-600 mr-2">
+              Status:
             </label>
             <select
               id="status-filter"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1); // Reset to first page when changing status
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All</option>
               <option value="new">New</option>
@@ -232,6 +223,47 @@ const ContactList: React.FC = () => {
               <option value="spam">Spam</option>
             </select>
           </div>
+
+          {/* Date filters */}
+          <div className="flex items-center">
+            <label htmlFor="startDate" className="text-sm text-gray-600 mr-2">
+              From:
+            </label>
+            <input
+              type="date"
+              id="startDate"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setCurrentPage(1); // Reset to first page when changing date
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div className="flex items-center">
+            <label htmlFor="endDate" className="text-sm text-gray-600 mr-2">
+              To:
+            </label>
+            <input
+              type="date"
+              id="endDate"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setCurrentPage(1); // Reset to first page when changing date
+              }}
+              min={startDate}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <button
+            onClick={clearDateFilters}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+          >
+            Clear Filters
+          </button>
         </div>
       </div>
 
@@ -241,13 +273,11 @@ const ContactList: React.FC = () => {
         </div>
       )}
 
-
-
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      ) : filteredContacts.length === 0 ? (
+      ) : contacts.length === 0 ? (
         <div className="bg-gray-50 p-6 rounded-lg text-center">
           <p className="text-gray-600">
             {statusFilter === 'all' 
@@ -272,10 +302,10 @@ const ContactList: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredContacts.map((contact, index) => (
+                {contacts.map((contact, index) => (
                   <tr key={contact._id} className={`hover:bg-gray-50 ${contact.status === 'new' ? 'bg-blue-50' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{filteredContacts.length - index}</div>
+                      <div className="text-sm font-medium text-gray-900">{contacts.length - index}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{contact.name}</div>
@@ -340,10 +370,10 @@ const ContactList: React.FC = () => {
       )}
 
       {/* Add pagination controls after the table */}
-      {!loading && filteredContacts.length > 0 && (
+      {!loading && contacts.length > 0 && (
         <div className="mt-4 flex justify-between items-center">
           <div className="text-sm text-gray-600">
-            Showing {filteredContacts.length} of {totalContacts} contacts
+            Showing {contacts.length} of {totalContacts} contacts
           </div>
           <div className="flex space-x-1">
             <button

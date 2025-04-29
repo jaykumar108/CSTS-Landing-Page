@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import EventSlider from './EventSlider';
 
 const About = () => {
   const handleDonateClick = () => {
@@ -34,39 +35,9 @@ const About = () => {
     </div>
   </div>
 
-  {/* Upcoming Events Card */}
-  <div className="lg:w-1/3 bg-white border border-gray-200 shadow-lg rounded-xl p-6">
-    <h3 className="text-xl font-semibold text-blue-900 mb-4">📅 Upcoming Events</h3>
-    <ul className="space-y-4 text-gray-700 text-sm">
-      <li>
-        <div className="font-semibold">Maithili Literature Workshop</div>
-        <div className="text-xs text-gray-500 gap-2">May 5, 2025 – Darbhanga
-        <a href="#" className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-5">Coming Soon</a></div>
-      </li>
-      <li>
-        <div className="font-semibold">Water Conservation Drive</div>
-        <div className="text-xs text-gray-500">May 15, 2025 – Madhubani
-          <a href="#" className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-4">Coming Soon</a>
-        </div>
-      </li>
-      <li>
-        <div className="font-semibold">Indo-Nepal Heritage Meetup</div>
-        <div className="text-xs text-gray-500">June 1, 2025 – Janakpur
-        <a href="#" className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-7">Coming Soon</a>
-        </div>
-      </li>
-      {/* <li>
-        <div className="font-semibold">Rural Upliftment Hackathon</div>
-        <div className="text-xs text-gray-500">June 20, 2025 – Online
-          <button className="text-blue-700 hover:underline text-sm font-medium bg-blue-100 px-2 py-1 rounded ml-7">Coming Soon</button>
-        </div>
-      </li> */}
-    </ul>
-    <div className="mt-6">
-      <Link to="/events" className="text-blue-700 hover:underline text-sm font-medium">
-        View All Events →
-      </Link>
-    </div>
+  {/* Upcoming Events Card - Using the slider component instead */}
+  <div className="lg:w-1/3">
+    <EventSlider />
   </div>
 </div>
 
@@ -97,7 +68,7 @@ const About = () => {
             <h3 className="text-2xl font-bold text-blue-950 mb-4">Our Vision</h3>
             <div className="max-w-3xl">
               <p className="text-gray-600 mb-6 leading-relaxed text-justify">
-                The CSTS aims to address the issue of uneven, unequal spectrum of developmental goals and it’s deep rooted crisis has propelled us to look for alternative modes of understanding. CSTS as an organization is an ardent believer in dynamism and pace of the tradition and traditional. We strive for becoming the voice of the marginalized.
+                The CSTS aims to address the issue of uneven, unequal spectrum of developmental goals and it's deep rooted crisis has propelled us to look for alternative modes of understanding. CSTS as an organization is an ardent believer in dynamism and pace of the tradition and traditional. We strive for becoming the voice of the marginalized.
               </p>
             </div>
           </div>

@@ -62,7 +62,7 @@ exports.getAllContacts = async (req, res) => {
     const reqQuery = { ...req.query };
     
     // Fields to exclude from filtering
-    const removeFields = ['select', 'sort', 'page', 'limit', 'search'];
+    const removeFields = ['select', 'sort', 'page', 'limit', 'search', 'startDate', 'endDate'];
     
     // Delete fields from reqQuery
     removeFields.forEach(param => delete reqQuery[param]);
@@ -76,6 +76,17 @@ exports.getAllContacts = async (req, res) => {
     // Base query from filters
     let queryObj = JSON.parse(queryStr);
     
+    // Add date filtering
+    if (req.query.startDate || req.query.endDate) {
+      queryObj.createdAt = {};
+      if (req.query.startDate) {
+        queryObj.createdAt.$gte = new Date(req.query.startDate);
+      }
+      if (req.query.endDate) {
+        queryObj.createdAt.$lte = new Date(req.query.endDate);
+      }
+    }
+    
     // Add search functionality
     if (req.query.search) {
       const searchRegex = new RegExp(req.query.search, 'i');
@@ -88,6 +99,11 @@ exports.getAllContacts = async (req, res) => {
           { message: searchRegex }
         ]
       };
+    }
+    
+    // Add status filter
+    if (req.query.status && req.query.status !== 'all') {
+      queryObj.status = req.query.status;
     }
     
     // Finding resources

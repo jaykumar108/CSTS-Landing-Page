@@ -1,5 +1,5 @@
 const Gallery = require('../models/Gallery');
-const cloudinary = require('cloudinary').v2;
+const { cloudinary } = require('../config/cloudinary');
 
 // @desc    Get all gallery images
 // @route   GET /api/gallery
@@ -63,6 +63,18 @@ exports.createGallery = async (req, res) => {
         message: 'Please upload an image'
       });
     }
+    
+    // Log file information for debugging
+    console.log('Uploaded file information:', req.file);
+
+    // Ensure we have the required fields from the upload
+    if (!req.file.path || !req.file.filename) {
+      return res.status(400).json({
+        success: false,
+        message: 'Image upload failed. Missing file information.',
+        fileInfo: req.file
+      });
+    }
 
     // Create gallery with image data from Cloudinary
     const gallery = await Gallery.create({
@@ -71,7 +83,7 @@ exports.createGallery = async (req, res) => {
       category: req.body.category,
       imageUrl: req.file.path,
       cloudinaryId: req.file.filename,
-      isPublished: req.body.isPublished || true,
+      isPublished: req.body.isPublished !== undefined ? req.body.isPublished : true,
       createdBy: req.user.id
     });
 
@@ -80,6 +92,7 @@ exports.createGallery = async (req, res) => {
       data: gallery
     });
   } catch (error) {
+    console.error('Gallery creation error:', error);
     res.status(500).json({
       success: false,
       message: error.message
@@ -103,12 +116,20 @@ exports.updateGallery = async (req, res) => {
 
     // Check if new image was uploaded
     if (req.file) {
-      // Delete previous image from Cloudinary
-      await cloudinary.uploader.destroy(gallery.cloudinaryId);
+      try {
+        // Delete previous image from Cloudinary if cloudinaryId exists
+        if (gallery.cloudinaryId) {
+          console.log(`Attempting to delete previous image: ${gallery.cloudinaryId}`);
+          await cloudinary.uploader.destroy(gallery.cloudinaryId);
+        }
 
-      // Update with new image data
-      req.body.imageUrl = req.file.path;
-      req.body.cloudinaryId = req.file.filename;
+        // Update with new image data
+        req.body.imageUrl = req.file.path;
+        req.body.cloudinaryId = req.file.filename;
+      } catch (uploadError) {
+        console.error('Error handling image update:', uploadError);
+        // Continue with the update even if image deletion fails
+      }
     }
 
     // Update gallery
@@ -122,6 +143,7 @@ exports.updateGallery = async (req, res) => {
       data: gallery
     });
   } catch (error) {
+    console.error('Gallery update error:', error);
     res.status(500).json({
       success: false,
       message: error.message
@@ -143,8 +165,16 @@ exports.deleteGallery = async (req, res) => {
       });
     }
 
-    // Delete image from Cloudinary
-    await cloudinary.uploader.destroy(gallery.cloudinaryId);
+    try {
+      // Delete image from Cloudinary if cloudinaryId exists
+      if (gallery.cloudinaryId) {
+        console.log(`Attempting to delete image: ${gallery.cloudinaryId}`);
+        await cloudinary.uploader.destroy(gallery.cloudinaryId);
+      }
+    } catch (deleteError) {
+      console.error('Error deleting image from Cloudinary:', deleteError);
+      // Continue with gallery deletion even if image deletion fails
+    }
 
     // Remove gallery from database
     await gallery.deleteOne();
@@ -154,6 +184,7 @@ exports.deleteGallery = async (req, res) => {
       data: {}
     });
   } catch (error) {
+    console.error('Gallery deletion error:', error);
     res.status(500).json({
       success: false,
       message: error.message

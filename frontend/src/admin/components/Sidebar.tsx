@@ -8,7 +8,9 @@ import {
   User, 
   LogOut,
   Menu, 
-  X 
+  X,
+  Users,
+  Calendar
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 
@@ -25,7 +27,9 @@ const Sidebar = () => {
     { path: '/admin/dashboard', icon: <Home size={20} />, label: 'Dashboard' },
     { path: '/admin/gallery', icon: <Image size={20} />, label: 'Gallery' },
     { path: '/admin/jobs', icon: <Briefcase size={20} />, label: 'Jobs' },
+    { path: '/admin/events', icon: <Calendar size={20} />, label: 'Events' },
     { path: '/admin/contacts', icon: <MessageSquare size={20} />, label: 'Contacts' },
+    { path: '/admin/collaborators', icon: <Users size={20} />, label: 'Collaborators' },
     { path: '/admin/profile', icon: <User size={20} />, label: 'Profile' }
   ];
 
@@ -56,14 +60,14 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`bg-white w-64 min-h-screen flex flex-col shadow-md transition-all duration-300 fixed lg:static z-30
+        className={`bg-white w-64 shrink-0 min-h-screen flex flex-col shadow-md transition-all duration-300 fixed lg:static z-30
                    ${isMobileMenuOpen ? 'left-0' : '-left-64 lg:left-0'}`}
       >
         <div className="p-4 border-b">
           <h1 className="text-2xl font-bold text-blue-900">CSTS Admin</h1>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="flex-1 py-4">
           <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.path}>

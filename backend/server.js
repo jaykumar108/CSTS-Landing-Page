@@ -7,6 +7,7 @@ const MongoStore = require('connect-mongo');
 const path = require('path');
 const passport = require('passport');
 const { createDefaultAdmin } = require('./controllers/authController');
+const { seedDefaultCollaborators } = require('./controllers/collaboratorController');
 const http = require('http');
 const socketIo = require('socket.io');
 
@@ -16,6 +17,9 @@ const galleryRoutes = require('./routes/gallery.routes');
 const jobRoutes = require('./routes/job.routes');
 const contactRoutes = require('./routes/contact.routes');
 const notificationRoutes = require('./routes/notification.routes');
+const collaboratorRoutes = require('./routes/collaborator.routes');
+const uploadRoutes = require('./routes/upload.routes');
+const eventRoutes = require('./routes/event.routes');
 
 // Load environment variables
 dotenv.config();
@@ -91,6 +95,8 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/admin-panel
     console.log('MongoDB Connected');
     // Create default admin user
     createDefaultAdmin();
+    // Seed default collaborators
+    seedDefaultCollaborators();
   })
   .catch((err) => console.log('MongoDB Connection Error: ', err));
 
@@ -100,6 +106,12 @@ app.use('/api/gallery', galleryRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/collaborators', collaboratorRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/events', eventRoutes);
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
