@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Clock, Gift, Laptop, Globe, ChevronRight, GraduationCap, Briefcase, HeartHandshake, Users, BrainCircuit, Star, BookOpen, Paintbrush } from 'lucide-react';
+import { Search, MapPin, Clock, Gift, Laptop, Globe, ChevronRight, GraduationCap, Briefcase, HeartHandshake, Users, BrainCircuit, Star, BookOpen, Paintbrush, X, Info } from 'lucide-react';
 import Footer from './Footer';
 import axios from 'axios';
 
@@ -78,11 +78,11 @@ const companyValues = [
 ];
 
 const Career = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('All');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [showModal, setShowModal] = useState(false);
   
   // Fetch jobs from the API
   useEffect(() => {
@@ -108,18 +108,20 @@ const Career = () => {
     fetchJobs();
   }, []);
 
-  // Filter jobs based on search term and type
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        job.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === 'All' || job.type === selectedType;
-    return matchesSearch && matchesType;
-  });
+  const openJobDetails = (job: Job) => {
+    setSelectedJob(job);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedJob(null);
+  };
   
   return (
     <>
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-24 pb-12 overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center opacity-10 z-0" 
              style={{ backgroundImage: "url('')" }} />
         
@@ -129,48 +131,21 @@ const Career = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-800 to-purple-600 bg-clip-text text-transparent mb-6"
+              className="text-3xl md:text-6xl font-bold bg-gradient-to-r from-blue-800 to-purple-600 bg-clip-text text-transparent mb-1"
             >
               Join Our Team
             </motion.h1>
-            
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-xl text-gray-700 mb-8 leading-relaxed"
-            >
-              Be part of our mission to preserve and promote the rich cultural heritage of Mithila. 
-              Explore exciting career opportunities and make a meaningful impact.
-            </motion.p>
-            
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row justify-center gap-4"
-            >
-              <a href="#opportunities" className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition-all">
-                View Opportunities
-              </a>
-              <a href="#volunteer" className="px-8 py-3 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold shadow-lg hover:bg-blue-50 transition-all">
-                Volunteer With Us
-              </a>
-            </motion.div>
           </div>
         </div>
       </section>
-
-   
-
       {/* Job Listings */}
-      <section id="opportunities" className="py-16 bg-white">
+      <section id="opportunities" className="py-4 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-4"
           >
             <motion.h2 
               variants={fadeInUp}
@@ -186,72 +161,6 @@ const Career = () => {
               Explore our open positions and find the perfect fit for your skills and interests
             </motion.p>
           </motion.div>
-          
-
-
-          
-          {/* Search and Filter */}
-          <div className="mb-8 flex flex-col md:flex-row gap-4">
-            <div className="relative flex-grow">
-              <input
-                type="text"
-                placeholder="Search positions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full py-3 pl-4 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            </div>
-            
-            <div className="flex gap-2">
-              <button 
-                onClick={() => setSelectedType('All')}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  selectedType === 'All' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                All
-              </button>
-              <button 
-                onClick={() => setSelectedType('Internship')}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  selectedType === 'Internship' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <GraduationCap className="inline-block w-4 h-4 mr-1" />
-                Internships
-              </button>
-              <button 
-                onClick={() => setSelectedType('Remote')}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  selectedType === 'Remote' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <Globe className="inline-block w-4 h-4 mr-1" />
-                Remote
-              </button>
-              <button 
-                onClick={() => setSelectedType('Full-time')}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  selectedType === 'Full-time' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <Briefcase className="inline-block w-4 h-4 mr-1" />
-                Full-time
-              </button>
-            </div>
-          </div>
-
-
-          
           
           {/* Loading State */}
           {loading && (
@@ -274,30 +183,24 @@ const Career = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {filteredJobs.length === 0 ? (
-                <div className="col-span-2 text-center py-12 bg-gray-50 rounded-xl">
-                  <p className="text-gray-500 text-lg">No positions found matching your criteria</p>
-                  <button
-                    onClick={() => {setSearchTerm(''); setSelectedType('All');}}
-                    className="mt-4 text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    Clear filters
-                  </button>
+              {jobs.length === 0 ? (
+                <div className="col-span-3 text-center py-12 bg-gray-50 rounded-xl">
+                  <p className="text-gray-500 text-lg">No positions available at the moment</p>
                 </div>
               ) : (
-                filteredJobs.map((job, index) => (
+                jobs.map((job, index) => (
                   <motion.div
                     key={job._id}
                     variants={fadeInUp}
                     custom={index}
                     whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                    className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all p-6 flex flex-col"
+                    className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all p-4 flex flex-col"
                   >
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-3">
                       <div>
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-2 ${
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-1 ${
                           job.type === 'Internship' 
                             ? 'bg-green-100 text-green-800' 
                             : job.type === 'Remote' 
@@ -306,10 +209,10 @@ const Career = () => {
                         }`}>
                           {job.type}
                         </span>
-                        <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
-                        <p className="text-gray-600">{job.department || job.company}</p>
+                        <h3 className="text-lg font-bold text-gray-900">{job.title}</h3>
+                        <p className="text-sm text-gray-600">{job.department || job.company}</p>
                       </div>
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                         job.type === 'Internship' 
                           ? 'bg-green-100' 
                           : job.type === 'Remote' 
@@ -317,68 +220,63 @@ const Career = () => {
                             : 'bg-purple-100'
                       }`}>
                         {job.type === 'Internship' 
-                          ? <GraduationCap className="w-6 h-6 text-green-600" />
+                          ? <GraduationCap className="w-5 h-5 text-green-600" />
                           : job.type === 'Remote'
-                            ? <Globe className="w-6 h-6 text-blue-600" />
-                            : <Briefcase className="w-6 h-6 text-purple-600" />
+                            ? <Globe className="w-5 h-5 text-blue-600" />
+                            : <Briefcase className="w-5 h-5 text-purple-600" />
                         }
                       </div>
                     </div>
                     
-                    <p className="text-gray-700 mb-4">{job.description}</p>
+                    <p className="text-sm text-gray-700 mb-3 line-clamp-2">{job.description}</p>
                     
                     {/* Job Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <MapPin className="w-4 h-4 text-gray-400" />
+                    <div className="grid grid-cols-1 gap-1 mb-3">
+                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                        <MapPin className="w-3 h-3 text-gray-400" />
                         <span>{job.location}</span>
                       </div>
                       {job.duration && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Clock className="w-4 h-4 text-gray-400" />
+                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                          <Clock className="w-3 h-3 text-gray-400" />
                           <span>{job.duration}</span>
                         </div>
                       )}
                       {job.perks && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Gift className="w-4 h-4 text-gray-400" />
+                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                          <Gift className="w-3 h-3 text-gray-400" />
                           <span>{job.perks}</span>
-                        </div>
-                      )}
-                      {job.note && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Laptop className="w-4 h-4 text-gray-400" />
-                          <span>{job.note}</span>
-                        </div>
-                      )}
-                      {job.salary && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Gift className="w-4 h-4 text-gray-400" />
-                          <span>{job.salary}</span>
                         </div>
                       )}
                     </div>
                     
                     {/* Skills */}
                     {job.skills && job.skills.length > 0 && (
-                      <div className="mb-6 flex flex-wrap gap-2">
+                      <div className="mb-4 flex flex-wrap gap-1">
                         {job.skills.map((skill, i) => (
-                          <span key={i} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs">
+                          <span key={i} className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs">
                             {skill}
                           </span>
                         ))}
                       </div>
                     )}
               
-                    <div className="mt-auto">
+                    <div className="mt-auto flex gap-2">
+                      <button
+                        onClick={() => openJobDetails(job)}
+                        className="flex-1 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg flex items-center justify-center gap-1 transition-colors text-sm"
+                      >
+                        View Details
+                        <Info className="w-3 h-3" />
+                      </button>
                       <a 
                         href={job.applicationLink || `mailto:${job.contactEmail || 'careers@csts.org'}`}
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+                        className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 transition-colors text-sm"
                       >
                         Apply Now
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-3 h-3" />
                       </a>
                     </div>
                   </motion.div>
@@ -388,6 +286,121 @@ const Career = () => {
           )}
         </div>
       </section>
+
+      {/* Job Details Modal */}
+      {showModal && selectedJob && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedJob.title}</h2>
+              <button 
+                onClick={closeModal}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
+                <X className="w-6 h-6 text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                  selectedJob.type === 'Internship' 
+                    ? 'bg-green-100 text-green-800' 
+                    : selectedJob.type === 'Remote' 
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-purple-100 text-purple-800'
+                }`}>
+                  {selectedJob.type}
+                </span>
+                <span className="text-gray-600">{selectedJob.department || selectedJob.company}</span>
+                <span className="flex items-center gap-1 text-gray-600">
+                  <MapPin className="w-4 h-4" />
+                  {selectedJob.location}
+                </span>
+              </div>
+              
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Description</h3>
+                <p className="text-gray-700 whitespace-pre-line">{selectedJob.description}</p>
+              </div>
+              
+              {selectedJob.requirements && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-2">Requirements</h3>
+                  <p className="text-gray-700 whitespace-pre-line">{selectedJob.requirements}</p>
+                </div>
+              )}
+              
+              {selectedJob.skills && selectedJob.skills.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-2">Required Skills</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedJob.skills.map((skill, i) => (
+                      <span key={i} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {selectedJob.duration && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Duration</h4>
+                    <p className="text-gray-600">{selectedJob.duration}</p>
+                  </div>
+                )}
+                
+                {selectedJob.salary && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Salary/Stipend</h4>
+                    <p className="text-gray-600">{selectedJob.salary}</p>
+                  </div>
+                )}
+                
+                {selectedJob.perks && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Perks</h4>
+                    <p className="text-gray-600">{selectedJob.perks}</p>
+                  </div>
+                )}
+                
+                {selectedJob.languages && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Languages</h4>
+                    <p className="text-gray-600">{selectedJob.languages}</p>
+                  </div>
+                )}
+              </div>
+              
+              {selectedJob.note && (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-medium text-blue-800 mb-1">Additional Note</h4>
+                  <p className="text-blue-700">{selectedJob.note}</p>
+                </div>
+              )}
+              
+              <div className="mt-8">
+                <a 
+                  href={selectedJob.applicationLink || `mailto:${selectedJob.contactEmail || 'careers@csts.org'}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+                >
+                  Apply For This Position
+                  <ChevronRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Volunteer Section */}
       <section id="volunteer" className="py-16 bg-gradient-to-br from-blue-800 to-indigo-900 text-white">

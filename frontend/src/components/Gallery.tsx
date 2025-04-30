@@ -231,7 +231,7 @@ const Gallery = () => {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4"
             >
               <AnimatePresence>
                 {filteredImages.length > 0 ? (
@@ -245,20 +245,20 @@ const Gallery = () => {
                       animate="visible"
                       exit="exit"
                       whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-                      className="bg-white rounded-xl overflow-hidden shadow-lg cursor-pointer"
+                      className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer"
                       onClick={() => handleImageClick(image)}
                     >
-                      <div className="relative overflow-hidden h-64">
+                      <div className="relative overflow-hidden h-32 sm:h-40">
                         <motion.img
                           src={image.imageUrl}
                           alt={image.title}
                           className="w-full h-full object-cover transition-transform duration-700 ease-in-out hover:scale-110"
-                          loading="lazy" // Add lazy loading for better performance
+                          loading="lazy"
                         />
                       </div>
-                      <div className="p-4">
-                        <h3 className="text-lg font-semibold text-gray-900">{image.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{image.description}</p>
+                      <div className="p-2 sm:p-3">
+                        <h3 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-1">{image.title}</h3>
+                        <p className="text-[10px] sm:text-xs text-gray-600 mt-1 line-clamp-2">{image.description}</p>
                       </div>
                     </motion.div>
                   ))
