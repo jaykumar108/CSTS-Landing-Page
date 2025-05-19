@@ -34,7 +34,7 @@ const server = http.createServer(app);
 // Setup Socket.IO
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -63,17 +63,17 @@ io.on('connection', (socket) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
   credentials: true
 }));
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/admin-panel',
+    mongoUrl: process.env.MONGO_URI,
     ttl: 14 * 24 * 60 * 60 // 14 days
   }),
   cookie: {
@@ -85,12 +85,12 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// JWT सीक्रेट सेट करें अगर एनवायरनमेंट वेरिएबल से नहीं मिला
+// JWT 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'your_secure_fallback_secret_key';
-process.env.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '14d';
+process.env.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '2d';
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/admin-panel')
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB Connected');
     // Create default admin user
