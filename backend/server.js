@@ -120,8 +120,10 @@ app.get('/', (req, res) => {
   });
 });
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve uploaded files (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {

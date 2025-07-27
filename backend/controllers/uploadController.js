@@ -4,22 +4,28 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const { cloudinary } = require('../config/cloudinary');
 
-// Create local uploads directory if using local storage as fallback
+// Create local uploads directory if using local storage as fallback (only in development)
 const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)){
-  fs.mkdirSync(uploadsDir, { recursive: true });
+if (process.env.NODE_ENV !== 'production' && !fs.existsSync(uploadsDir)){
+  try {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  } catch (error) {
+    console.log('Could not create uploads directory:', error.message);
+  }
 }
 
-// Configure local storage as fallback
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
+// Configure storage based on environment
+const storage = process.env.NODE_ENV === 'production' 
+  ? multer.memoryStorage() 
+  : multer.diskStorage({
+      destination: function (req, file, cb) {
+        cb(null, uploadsDir);
+      },
+      filename: function (req, file, cb) {
+        const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+        cb(null, uniqueName);
+      }
+    });
 
 // Set file filter
 const fileFilter = (req, file, cb) => {

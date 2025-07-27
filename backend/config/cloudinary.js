@@ -10,17 +10,26 @@ cloudinary.config({
   api_key: "817248727652271",
   api_secret: "Lw_IyI-21YHvig3AovvVbCbrn3Q"
 });
-
-// Create local storage as fallback
+  
+// Create local storage as fallback (only in development)
 const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+if (process.env.NODE_ENV !== 'production' && !fs.existsSync(uploadsDir)) {
+  try {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  } catch (error) {
+    console.log('Could not create uploads directory:', error.message);
+  }
 }
 
 // Local storage configuration
 const diskStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadsDir);
+    // In production, use memory storage instead of disk
+    if (process.env.NODE_ENV === 'production') {
+      cb(null, '/tmp'); // Use temp directory in production
+    } else {
+      cb(null, uploadsDir);
+    }
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -101,11 +110,13 @@ try {
 } catch (error) {
   console.error("Cloudinary configuration error:", error);
   
-  // Fallback to local storage if Cloudinary fails
-  console.log("Using fallback local storage for uploads");
+  // Fallback to memory storage if Cloudinary fails (better for serverless)
+  console.log("Using fallback memory storage for uploads");
+  
+  const memoryStorage = multer.memoryStorage();
   
   const localUpload = multer({
-    storage: diskStorage,
+    storage: process.env.NODE_ENV === 'production' ? memoryStorage : diskStorage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: fileFilter
   });
