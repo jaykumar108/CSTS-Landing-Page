@@ -69,7 +69,7 @@ app.use(cors({
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'your_secure_session_secret_key',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
@@ -109,6 +109,16 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/collaborators', collaboratorRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/events', eventRoutes);
+
+// Root route to show server is running
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Server is running!',
+    status: 'success',
+    timestamp: new Date().toISOString(),
+    port: PORT
+  });
+});
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
